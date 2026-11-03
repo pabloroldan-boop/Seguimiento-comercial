@@ -1,0 +1,591 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="Seguimiento comercial diario de Zuppa Distribuidora: ventas, precio por HL y rentabilidad.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20120%2084%22%20role%3D%22img%22%20aria-label%3D%22Zuppa%20distribuidora%22%3E%0A%20%20%3Cdefs%3E%3ClinearGradient%20id%3D%22zg%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%220.35%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22%23e3242b%22/%3E%3Cstop%20offset%3D%22.55%22%20stop-color%3D%22%23cf1f26%22/%3E%3Cstop%20offset%3D%22.78%22%20stop-color%3D%22%234a1416%22/%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23111%22/%3E%3C/linearGradient%3E%3C/defs%3E%0A%20%20%3Cpath%20fill%3D%22url%28%23zg%29%22%20d%3D%22M79%202%20C87%2023%2077%2043%2059%2043%20C48.5%2043%2041%2037.5%2037.5%2029%20L45%2026.5%20C48%2032%2052.5%2035%2059%2035%20C71.5%2035%2081.5%2022%2079%202%20Z%22/%3E%0A%20%20%3Cpath%20fill%3D%22%23e3242b%22%20d%3D%22M32%2013%20L49.5%2022%20L36.5%2032.5%20Z%22/%3E%0A%20%20%3Ctext%20x%3D%2260%22%20y%3D%2266%22%20text-anchor%3D%22middle%22%20font-family%3D%22Arial%20Black%2CArial%2CHelvetica%2Csans-serif%22%20font-weight%3D%22900%22%20font-size%3D%2224%22%20letter-spacing%3D%220.5%22%20fill%3D%22%23141414%22%3EZUPPA%3C/text%3E%0A%20%20%3Ctext%20x%3D%2260%22%20y%3D%2279%22%20text-anchor%3D%22middle%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%228.2%22%20letter-spacing%3D%222.6%22%20fill%3D%22%239a9a9a%22%3Edistribuidora%3C/text%3E%0A%3C/svg%3E">
+<style>
+html{-webkit-text-size-adjust:100%}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;font-size:14px}
+img,svg{max-width:100%}
+[hidden]{display:none!important}
+</style>
+<title>Seguimiento Comercial Zuppa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap">
+<style>
+/* Tema claro fijo. Layout: barra superior fija con marca, vistas y filtros globales; cada vista abre con resumen (KPIs) y baja al detalle. Paleta tomada de los tableros Power BI de Zuppa. */
+:root{
+  --bg:#eef1f8; --surface:#ffffff; --surface-2:#f5f7fc; --line:#dde2ee;
+  --ink:#0e1b4d; --text:#26304f; --muted:#66708c;
+  --navy:#16297a; --cer:#0f7a72; --ung:#2c55c9; --acc:#e2702f;
+  --c3:#5aa7c9; --c4:#8a3f6b; --c5:#c99a2e; --c6:#8b93a8;
+  --good:#1d8a4b; --bad:#c43a2f; --warn:#c98a12;
+  --good-bg:#e5f4ea; --bad-bg:#fbe7e5; --warn-bg:#fbf1dc;
+  color-scheme:light;
+  --f-disp:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --f-body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--f-body);font-size:14px;line-height:1.45}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+.wrap{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));max-width:1440px;margin:0 auto}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surface);border-bottom:1px solid var(--line)}
+.bar{display:flex;align-items:center;gap:20px;padding-block:10px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px}
+.brand .logo{height:58px;width:auto;display:block;flex:none}
+.brand span{border-left:1px solid var(--line);padding-left:12px;line-height:1.25}
+.brand b{font-family:var(--f-disp);font-weight:700;font-size:24px;letter-spacing:.04em;color:var(--ink)}
+.brand span{color:var(--muted);font-size:12px}
+nav.tabs{display:flex;gap:4px;overflow-x:auto;flex:1;min-width:0;scrollbar-width:none}
+nav.tabs a{white-space:nowrap;text-decoration:none;color:var(--muted);font-weight:600;font-size:13px;padding:7px 11px;border-radius:6px}
+nav.tabs a:hover{color:var(--ink);background:var(--surface-2)}
+nav.tabs a[aria-current="page"]{color:#fff;background:var(--navy)}
+nav.tabs a .new{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--acc);margin-left:4px}
+nav.tabs a[aria-current="page"] .new{color:inherit;opacity:.8}
+.filters{display:flex;gap:10px;flex-wrap:wrap;padding-block:0 10px;align-items:end}
+.cal>label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600;margin-bottom:2px}
+.filters label{display:flex;flex-direction:column;gap:2px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600}
+.filters select{font:inherit;font-size:13px;text-transform:none;letter-spacing:0;color:var(--ink);background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:5px 8px;min-width:120px}
+.filters button{font:inherit;font-size:13px;font-weight:600;color:var(--navy);background:none;border:1px solid var(--line);border-radius:6px;padding:5px 10px;cursor:pointer}
+.cal{position:relative}
+.cal-btn{font:inherit;font-size:13px;color:var(--ink);background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:5px 10px;cursor:pointer;display:flex;align-items:center;gap:8px;min-width:200px;text-align:left}
+.cal-btn svg{flex:none;color:var(--navy)}
+.cal-pop{position:absolute;top:calc(100% + 6px);left:0;z-index:20;background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:0 10px 30px rgba(14,27,77,.16);padding:14px;width:300px;max-width:calc(100vw - 32px)}
+.cal-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+.cal-head b{font-family:var(--f-disp);font-size:18px;color:var(--ink)}
+.cal-head span{font-size:12px;color:var(--muted)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center}
+.cal-grid .dw{font-size:11px;font-weight:600;color:var(--muted);padding:4px 0;text-transform:uppercase}
+.cal-grid button{font:inherit;font-size:13px;font-variant-numeric:tabular-nums;border:0;background:none;color:var(--ink);height:34px;border-radius:6px;cursor:pointer}
+.cal-grid button:hover:not(:disabled){background:var(--surface-2)}
+.cal-grid button:disabled{color:var(--line);cursor:default}
+.cal-grid button.in{background:color-mix(in srgb,var(--navy) 12%,transparent);border-radius:0}
+.cal-grid button.edge,.cal-grid button.edge:hover:not(:disabled){background:var(--navy);color:#fff;border-radius:6px;font-weight:600}
+.cal-grid button.pend{outline:2px solid var(--acc);outline-offset:-2px}
+.cal-pre{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
+.cal-pre button{font:inherit;font-size:12px;font-weight:600;color:var(--navy);background:var(--surface-2);border:1px solid var(--line);border-radius:999px;padding:3px 10px;cursor:pointer}
+.cal-hint{font-size:11px;color:var(--muted);margin-top:8px}
+.filters .stamp{margin-left:auto;font-size:12px;color:var(--muted);text-align:right}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+main{padding-block:20px 48px}
+.view{display:grid;gap:16px}
+.vh{display:flex;align-items:end;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.vh h1{font-family:var(--f-disp);font-weight:700;font-size:30px;line-height:1.05;margin:0;color:var(--ink);letter-spacing:.01em;text-wrap:balance}
+.vh p{margin:4px 0 0;color:var(--muted);max-width:70ch}
+.note{font-size:12px;color:var(--muted)}
+.chip{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;border-radius:999px;padding:2px 9px;white-space:nowrap}
+.chip.good{background:var(--good-bg);color:var(--good)} .chip.bad{background:var(--bad-bg);color:var(--bad)} .chip.warn{background:var(--warn-bg);color:var(--warn)} .chip.mut{background:var(--surface-2);color:var(--muted)}
+.grid{display:grid;gap:16px}
+.k5{grid-template-columns:repeat(auto-fit,minmax(min(100%,160px),1fr))}
+.g2{grid-template-columns:repeat(auto-fit,minmax(min(100%,460px),1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr))}
+.g21{grid-template-columns:minmax(0,2fr) minmax(0,1fr)}
+@media (max-width:980px){.g21{grid-template-columns:minmax(0,1fr)}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;min-width:0}
+.card h2{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink);margin:0 0 10px;font-weight:700;display:flex;justify-content:space-between;gap:8px;align-items:baseline;flex-wrap:wrap}
+.card h2 small{font-weight:500;letter-spacing:0;text-transform:none;color:var(--muted);font-size:12px}
+.kpi .lab{font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.kpi .val{font-family:var(--f-disp);font-weight:700;font-size:40px;line-height:1.05;color:var(--ink);font-variant-numeric:tabular-nums;margin-top:4px}
+.kpi .val small{font-size:20px;font-weight:600;color:var(--muted);margin-left:3px}
+.kpi .sub{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:6px;font-size:12px;color:var(--muted)}
+.kpi.cer .val{color:var(--cer)} .kpi.ung .val{color:var(--ung)}
+.pace .track{position:relative;height:14px;background:var(--surface-2);border-radius:7px;margin:14px 0 6px;border:1px solid var(--line)}
+.pace .fill{position:absolute;inset:0 auto 0 0;border-radius:6px}
+.pace .proj{position:absolute;top:0;bottom:0;border-radius:0 6px 6px 0;opacity:.28}
+.pace .tick{position:absolute;top:-6px;bottom:-6px;width:2px;background:var(--ink)}
+.pace .tick span{position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:10px;white-space:nowrap;color:var(--muted)}
+.pace .scale{display:flex;justify-content:space-between;font-size:11px;color:var(--muted)}
+.pace dl{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:12px 0 0}
+@media (max-width:520px){.pace dl{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.pace dt{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.pace dd{margin:0;font-family:var(--f-disp);font-size:22px;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}
+.pace p{margin:10px 0 0;font-size:13px}
+.chart{position:relative;height:280px}
+.chart.tall{height:360px} .chart.short{height:220px}
+.tw{overflow:auto;max-height:440px;border-radius:6px}
+table{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
+th,td{padding:6px 8px;text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+td.l,th.l{text-align:left}
+thead th{position:sticky;top:0;background:var(--surface-2);color:var(--ink);font-size:12px;font-weight:600;border-bottom:1px solid var(--line);cursor:pointer;user-select:none}
+thead th[aria-sort="descending"]::after{content:" ▾"} thead th[aria-sort="ascending"]::after{content:" ▴"}
+tbody tr:nth-child(even){background:var(--surface-2)}
+tbody tr:hover{background:color-mix(in srgb,var(--navy) 8%,transparent)}
+tfoot td{font-weight:700;color:var(--ink);border-top:2px solid var(--ink);position:sticky;bottom:0;background:var(--surface)}
+td.neg{color:var(--bad);font-weight:600} td.pos{color:var(--good)}
+td .bar-in{display:inline-block;height:6px;border-radius:3px;background:var(--navy);vertical-align:middle;margin-right:6px;opacity:.75}
+.search{font:inherit;font-size:13px;color:var(--ink);background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:5px 9px;width:100%;max-width:260px;margin-bottom:8px}
+.ins{display:grid;gap:12px;margin:0;padding:0;list-style:none}
+.ins li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:start}
+.ins li p{margin:0;max-width:80ch}
+.ins li b{color:var(--ink)}
+.sev{width:9px;height:9px;border-radius:50%;margin-top:6px}
+.sev.bad{background:var(--bad)} .sev.warn{background:var(--warn)} .sev.good{background:var(--good)} .sev.info{background:var(--navy)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-bottom:6px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.legend i.ln{height:2px;border-radius:0;vertical-align:3px;width:14px}
+.legend i.dash{height:0;border-top:2px dashed;background:none!important;vertical-align:3px;width:14px}
+.yoy td:first-child{font-weight:600;color:var(--ink);white-space:normal;min-width:140px}
+.yoy td.note{white-space:normal}
+.tag{font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--acc);font-weight:700}
+@media (max-width:640px){header.top{position:static}.bar{flex-direction:column;align-items:stretch;gap:8px}nav.tabs{flex:none;width:100%;max-width:100%}.filters label{flex:1 1 140px}.filters select{width:100%;min-width:0}.kpi .val{font-size:30px}.vh h1{font-size:24px}.filters .stamp{margin-left:0;text-align:left}.cal{flex:1 1 100%}.cal-btn{width:100%;min-width:0}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <div class="bar">
+      <div class="brand"><svg class="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 84" role="img" aria-label="Zuppa distribuidora">
+  <defs><linearGradient id="zg" x1="0" y1="0" x2="1" y2="0.35"><stop offset="0" stop-color="#e3242b"/><stop offset=".55" stop-color="#cf1f26"/><stop offset=".78" stop-color="#4a1416"/><stop offset="1" stop-color="#111"/></linearGradient></defs>
+  <path fill="url(#zg)" d="M79 2 C87 23 77 43 59 43 C48.5 43 41 37.5 37.5 29 L45 26.5 C48 32 52.5 35 59 35 C71.5 35 81.5 22 79 2 Z"/>
+  <path fill="#e3242b" d="M32 13 L49.5 22 L36.5 32.5 Z"/>
+  <text x="60" y="66" text-anchor="middle" font-family="Arial Black,Arial,Helvetica,sans-serif" font-weight="900" font-size="24" letter-spacing="0.5" fill="#141414">ZUPPA</text>
+  <text x="60" y="79" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="8.2" letter-spacing="2.6" fill="#9a9a9a">distribuidora</text>
+</svg><span>Seguimiento<br>comercial</span></div>
+      <nav class="tabs" id="tabs" aria-label="Vistas">
+        <a href="#resumen">Resumen<span class="new">nuevo</span></a>
+        <a href="#diario">Diario</a>
+        <a href="#acumulado">Acumulado</a>
+        <a href="#preciodiario">$/HL diario</a>
+        <a href="#preciomensual">$/HL mensual</a>
+        <a href="#clientes">Rentabilidad clientes</a>
+        <a href="#productos">Rentabilidad productos</a>
+      </nav>
+    </div>
+    <div class="filters">
+      <label for="fUn">Unidad de negocio<select id="fUn"></select></label>
+      <label for="fCa">Canal<select id="fCa"></select></label>
+      <label for="fDe">Departamento<select id="fDe"></select></label>
+      <div class="cal"><label for="fCal">Período</label><button type="button" class="cal-btn" id="fCal" aria-haspopup="dialog" aria-expanded="false"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="1.5" y="2.5" width="13" height="12" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M1.5 6.5h13M5 1v3M11 1v3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg><span id="fCalTxt"></span></button><div class="cal-pop" id="calPop" role="dialog" aria-label="Elegir período" hidden></div></div>
+      <button id="fReset" type="button">Limpiar filtros</button>
+      <div class="stamp" id="stamp"></div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap" id="main"></main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="data.js"></script>
+<script>
+const X = window.DATA;
+const UN = X.uns, CA = X.canals, UNS=['Cerveza','UNG','Aguas','Vino','Marketplace','Adyacencias'];
+const MES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+const MESL = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const MC = X.mes, YR = X.anio, YA = X.anio-1, MCN = MESL[MC-1], mcn = MCN.toLowerCase();   // mes en curso
+const CER = MC-1;                                                                        // meses cerrados del año
+const rangoCerr = CER>=1? `Ene–${MES[CER-1]}` : '';
+const feriadosTxt = X.feriados && X.feriados.length? `sin los feriados del ${X.feriados.join(' y ')}` : 'sin feriados';
+const DOW = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+const CANAL_NOMBRE = {MAYO:'Mayorista','K+T':'Kioscos + Tradicional',REF:'Refrigerado',AS:'Autoservicios',NO:'Sin canal'};
+const DIAS = [...new Set(X.D.map(r=>r[0]))].sort((a,b)=>a-b);
+const HAB = X.habiles, CORTE = DIAS[DIAS.length-1];
+const HAB_TRANS = HAB.filter(d=>d<=CORTE).length, HAB_REST = HAB.length-HAB_TRANS;
+
+/* ---------- formato ---------- */
+const nf = d => new Intl.NumberFormat('es-AR',{minimumFractionDigits:d,maximumFractionDigits:d});
+const N = (x,d=0) => isFinite(x)? nf(d).format(x) : '–';
+const MM = (x,d=1) => (x<0?'−':'')+'$'+N(Math.abs(x)/1e6,d)+' M';
+const PH = (x) => '$'+N(x/1000,0)+' mil';        // $ por HL, en miles
+const PCT = (x,d=1) => isFinite(x)? N(x*100,d)+'%' : '–';
+const SPCT = (x,d=1) => !isFinite(x)? '–' : (x>0?'+':'')+N(x*100,d)+'%';
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const chip = (x,good=true,d=1,suffix='') => { if(!isFinite(x)) return '<span class="chip mut">–</span>'; const up=x>=0; const ok = good? up : !up; return `<span class="chip ${ok?'good':'bad'}">${up?'▲':'▼'} ${N(Math.abs(x*100),d)}%${suffix}</span>`; };
+const esc = s => String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ---------- estado y filtros ---------- */
+const st = {un:-1, ca:-1, de:-1, d1:DIAS[0], d2:CORTE, view:'resumen'};
+function opt(sel, items, all){ sel.innerHTML = (all?`<option value="-1">${all}</option>`:'') + items.map(([v,t])=>`<option value="${v}">${esc(t)}</option>`).join(''); }
+opt(fUn, UN.map((u,i)=>[i,u]), 'Todas');
+opt(fCa, CA.map((c,i)=>[i,c]), 'Todos');
+opt(fDe, X.deps.map((d,i)=>[i,d]), 'Todos');
+const diaLbl = d => `${DOW[new Date(YR,MC-1,d).getDay()]} ${d}/${MC}`;
+const cal = {pend:null};
+function calText(){ fCalTxt.textContent = st.d1===st.d2? `${diaLbl(st.d1)}` : (st.d1===DIAS[0]&&st.d2===CORTE? `Mes a la fecha · 1 al ${CORTE}/${MC}` : `${diaLbl(st.d1)} al ${diaLbl(st.d2)}`); }
+function calDraw(){
+  const first=new Date(YR,MC-1,1).getDay(), off=(first+6)%7, last=new Date(YR,MC,0).getDate();
+  let h=`<div class="cal-head"><b>${MCN} ${YR}</b><span>${cal.pend?'Elegí el día final':'Elegí el día inicial'}</span></div><div class="cal-grid">`+['Lu','Ma','Mi','Ju','Vi','Sá','Do'].map(x=>`<span class="dw">${x}</span>`).join('');
+  for(let i=0;i<off;i++) h+='<span></span>';
+  for(let d=1; d<=last; d++){ const ok=DIAS.includes(d); const lo=cal.pend??st.d1, hi=cal.pend??st.d2;
+    const cls = cal.pend===d? 'edge pend' : (!cal.pend && (d===st.d1||d===st.d2))? 'edge' : (!cal.pend && d>lo && d<hi)? 'in' : '';
+    h+=`<button type="button" data-d="${d}" class="${cls}" ${ok?'':'disabled title="Sin ventas"'} aria-label="${d} de ${mcn}${ok?'':', sin ventas'}">${d}</button>`; }
+  h+=`</div><div class="cal-pre"><button type="button" data-p="mes">Mes a la fecha</button><button type="button" data-p="sem">Últimos 6 días hábiles</button><button type="button" data-p="dia">Último día</button><button type="button" data-p="ant">Día anterior</button></div><p class="cal-hint">Dos clics: día inicial y día final. Los días grises no tienen ventas.</p>`;
+  calPop.innerHTML=h;
+}
+function calSet(a,b){ st.d1=Math.min(a,b); st.d2=Math.max(a,b); cal.pend=null; calText(); calClose(); render(); }
+function calOpen(){ cal.pend=null; calDraw(); calPop.hidden=false; fCal.setAttribute('aria-expanded','true'); }
+function calClose(){ calPop.hidden=true; fCal.setAttribute('aria-expanded','false'); }
+fCal.onclick=e=>{ e.stopPropagation(); calPop.hidden? calOpen() : calClose(); };
+calPop.onclick=e=>{ e.stopPropagation(); const b=e.target.closest('button'); if(!b) return;
+  if(b.dataset.d){ const d=+b.dataset.d; if(cal.pend==null){ cal.pend=d; calDraw(); } else calSet(cal.pend,d); }
+  const p=b.dataset.p; if(p==='mes') calSet(DIAS[0],CORTE); if(p==='sem') calSet(DIAS[Math.max(0,DIAS.length-6)],CORTE); if(p==='dia') calSet(CORTE,CORTE); if(p==='ant'){ const d=DIAS[Math.max(0,DIAS.length-2)]; calSet(d,d); } };
+document.addEventListener('click',()=>{ if(!calPop.hidden) calClose(); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&!calPop.hidden){ calClose(); fCal.focus(); } });
+calText();
+stamp.innerHTML = `Datos al <b>${X.corte}</b> · ${HAB_TRANS} de ${HAB.length} días hábiles<br>Excluye producto 6074 · Codificador y Cliente Patio`;
+for (const [el,k] of [[fUn,'un'],[fCa,'ca'],[fDe,'de']]) el.addEventListener('change',()=>{ st[k]=+el.value; render(); });
+fReset.onclick = ()=>{ Object.assign(st,{un:-1,ca:-1,de:-1,d1:DIAS[0],d2:CORTE}); fUn.value=fCa.value=fDe.value=-1; calText(); render(); };
+
+// D: día, cliente, canal, un, depto, transporte, hl, final
+// P: día, cliente, producto, canal, un, depto, hl, pnsf, neto, ts
+// M: año, mes, un, canal, hl, neto, final
+const fD = (o={}) => { const s={...st,...o}; return X.D.filter(r=>(s.un<0||r[3]===s.un)&&(s.ca<0||r[2]===s.ca)&&(s.de<0||r[4]===s.de)&&r[0]>=s.d1&&r[0]<=s.d2); };
+const fP = (o={}) => { const s={...st,...o}; return X.P.filter(r=>(s.un<0||r[4]===s.un)&&(s.ca<0||r[3]===s.ca)&&(s.de<0||r[5]===s.de)&&r[0]>=s.d1&&r[0]<=s.d2); };
+const fM = (o={}) => { const s={...st,...o}; return X.M.filter(r=>(s.un<0||r[2]===s.un)&&(s.ca<0||r[3]===s.ca)); };
+function grp(rows, key, idx){ const m=new Map(); for(const r of rows){ const k=key(r); let a=m.get(k); if(!a){a=new Array(idx.length).fill(0); a.n=0; m.set(k,a);} for(let i=0;i<idx.length;i++) a[i]+=r[idx[i]]; a.n++; } return m; }
+const sum = (rows,i) => { let s=0; for(const r of rows) s+=r[i]; return s; };
+const uniq = (rows,i) => new Set(rows.map(r=>r[i])).size;
+
+/* ---------- gráficos ---------- */
+const charts = [];
+function killCharts(){ while(charts.length) charts.pop().destroy(); }
+function baseOpts(){
+  const mut=css('--muted'), line=css('--line'), ink=css('--ink');
+  Chart.defaults.font.family = css('--f-body'); Chart.defaults.locale='es-AR'; Chart.defaults.color = mut;
+  return {responsive:true, maintainAspectRatio:false, animation:false,
+    interaction:{mode:'index',intersect:false},
+    plugins:{legend:{display:false}, tooltip:{backgroundColor:css('--surface'),titleColor:ink,bodyColor:css('--text'),borderColor:line,borderWidth:1,padding:10,boxPadding:4,usePointStyle:true}},
+    scales:{x:{grid:{display:false},border:{color:line},ticks:{color:mut}}, y:{grid:{color:line},border:{display:false},ticks:{color:mut}}}};
+}
+const valueLabels = {id:'vl', afterDatasetsDraw(ch){ const o=ch.$vl; if(!o) return; const {ctx}=ch; ctx.save(); ctx.font=`600 11px ${css('--f-body')}`; ctx.fillStyle=css('--text');
+  ch.data.datasets.forEach((ds,di)=>{ if(o.only!=null && o.only!==di) return; const meta=ch.getDatasetMeta(di); if(meta.hidden) return; meta.data.forEach((el,i)=>{ const v=ds.data[i]; if(v==null) return; const t=o.fmt(v,i,di); if(!t) return;
+    if(ch.options.indexAxis==='y'){ ctx.textAlign='left'; ctx.textBaseline='middle'; ctx.fillText(t, el.x+6, el.y); }
+    else if(o.inside){ ctx.textAlign='center'; ctx.textBaseline='top'; ctx.save(); ctx.fillStyle=css('--surface'); ctx.fillText(t, el.x, el.y+6); ctx.restore(); } else { ctx.textAlign='center'; ctx.textBaseline='bottom'; const y = o.top? Math.min(el.y, el.base) : el.y; ctx.fillText(t, el.x, y-4); } }); }); ctx.restore(); }};
+Chart.register(valueLabels);
+function mk(id, cfg){ const el=document.getElementById(id); if(!el) return; const vl=cfg.options&&cfg.options.plugins&&cfg.options.plugins.vl; if(vl) delete cfg.options.plugins.vl; const c=new Chart(el,cfg); c.$vl=vl; c.draw(); charts.push(c); return c; }
+const unColor = i => [css('--cer'),css('--ung'),css('--c3'),css('--c4'),css('--c5'),css('--c6')][i];
+
+/* ---------- tablas ordenables ---------- */
+function table(host, cols, rows, {foot, sort=1, dir=-1, limit, search}={}){
+  host.innerHTML = (search?`<input class="search" type="search" id="${host.id}-q" placeholder="${search}" aria-label="${search}">`:'')+'<div class="tw"><table><thead><tr></tr></thead><tbody></tbody><tfoot></tfoot></table></div>';
+  const thead=host.querySelector('thead tr'), tb=host.querySelector('tbody'), tf=host.querySelector('tfoot'); let q='';
+  cols.forEach((c,i)=>{ const th=document.createElement('th'); th.textContent=c.t; if(c.l) th.className='l'; th.tabIndex=0; th.onclick=th.onkeydown=e=>{ if(e.type==='keydown'&&e.key!=='Enter') return; if(sort===i) dir=-dir; else {sort=i; dir=c.l?1:-1;} draw(); }; thead.appendChild(th); });
+  function draw(){
+    [...thead.children].forEach((th,i)=>th.setAttribute('aria-sort', i===sort?(dir<0?'descending':'ascending'):'none'));
+    let r = rows.filter(x=>!q || String(x[0]).toLowerCase().includes(q));
+    r.sort((a,b)=>{ const va=a[sort], vb=b[sort]; return (typeof va==='string'? va.localeCompare(vb) : ((isFinite(va)?va:-1e18)-(isFinite(vb)?vb:-1e18)))*dir; });
+    if(limit) r=r.slice(0,limit);
+    tb.innerHTML = r.map(x=>'<tr>'+cols.map((c,i)=>{ const v=x[i]; const cl=(c.l?'l ':'')+(c.sign&&isFinite(v)&&v<0?'neg':''); return `<td class="${cl}">${c.f?c.f(v,x):esc(v)}</td>`; }).join('')+'</tr>').join('');
+  }
+  if(foot) tf.innerHTML = '<tr>'+cols.map((c,i)=>`<td class="${c.l?'l':''}">${foot[i]==null?'':(c.f&&i>0?c.f(foot[i],foot):esc(foot[i]))}</td>`).join('')+'</tr>';
+  if(search) host.querySelector('.search').oninput=e=>{ q=e.target.value.toLowerCase(); draw(); };
+  draw();
+}
+
+/* ---------- métricas comunes ---------- */
+function pace(u){
+  // ritmo contra objetivo: todo el mes a la fecha, respeta canal y departamento
+  const rows = X.D.filter(r=>r[3]===u&&(st.ca<0||r[2]===st.ca)&&(st.de<0||r[4]===st.de));
+  const real=sum(rows,6), obj=X.obj[UN[u]], prom=real/HAB_TRANS, proy=real+prom*HAB_REST, req=Math.max(0,(obj-real)/HAB_REST);
+  return {real,obj,prom,proy,req,alc:real/obj,alcProy:proy/obj,tiempo:HAB_TRANS/HAB.length};
+}
+function paceCard(u){
+  const p=pace(u), col = u===0?'var(--cer)':'var(--ung)', w=x=>Math.min(100,x*100);
+  const sev = p.alcProy>=1?'good':p.alcProy>=.9?'warn':'bad';
+  const temprano = HAB_TRANS<5? `<p class="note">Con ${HAB_TRANS} ${HAB_TRANS===1?'día hábil transcurrido':'días hábiles transcurridos'} la proyección todavía no es representativa.</p>`:'';
+  const filt = temprano + ((st.ca>=0||st.de>=0)? '<p class="note">El objetivo no tiene apertura por canal o departamento: se compara la porción filtrada contra el objetivo total.</p>':'');
+  return `<div class="card pace"><h2>${u===0?'Cerveza':'UNG'} · avance vs objetivo <span class="chip ${HAB_TRANS<5?'mut':sev}">${HAB_TRANS<5?'Proyección preliminar':'Cierre proyectado'} ${PCT(p.alcProy,0)}</span></h2>
+   <div class="track" role="img" aria-label="Avance ${PCT(p.alc,1)} con ${PCT(p.tiempo,0)} del mes transcurrido">
+     <div class="fill" style="width:${w(p.alc)}%;background:${col}"></div>
+     <div class="proj" style="left:${w(p.alc)}%;width:${Math.max(0,w(p.alcProy)-w(p.alc))}%;background:${col}"></div>
+     <div class="tick" style="left:${w(p.tiempo)}%"></div></div>
+   <div class="scale"><span>0</span><span>▮ mes transcurrido ${PCT(p.tiempo,0)} · sombreado: proyección</span><span>Objetivo ${N(p.obj)} HL</span></div>
+   <dl><div><dt>Real</dt><dd>${N(p.real)} HL</dd></div><div><dt>Alcance</dt><dd>${PCT(p.alc,1)}</dd></div>
+   <div><dt>Prom. diario</dt><dd>${N(p.prom)} HL</dd></div><div><dt>Requerido/día</dt><dd style="color:${p.req>p.prom*1.1?'var(--bad)':'var(--ink)'}">${N(p.req)} HL</dd></div></dl>
+   <p>Al ritmo actual cierra en <b>${N(p.proy)} HL</b>. Para llegar al objetivo hacen falta <b>${N(p.req)} HL por día</b> ${HAB_REST===1?'en el día hábil que queda':`en los ${HAB_REST} días hábiles que quedan`}, ${N(p.req/p.prom,1)} veces el promedio del mes.</p>${filt}</div>`;
+}
+function rentab(rows){ const pn=sum(rows,7), ne=sum(rows,8), ts=sum(rows,9), hl=sum(rows,6); return {pn,ne,ts,hl,mb:ne-pn,pmb:(ne-pn)/ne,ppn:pn/ne,mts:ne+ts-pn,pmts:(ne+ts-pn)/(ne+ts),ph:ne/hl}; }
+function rentRows(m, name){ return [...m].map(([k,a])=>{ const [hl,pn,ne,ts]=a; return [name(k),ne,hl,ne/hl,(ne-pn)/ne,ts,(ne+ts-pn)/(ne+ts),ne+ts-pn,ne-pn]; }); }
+const rentCols = (first) => [{t:first,l:1},{t:'$ Neto',f:v=>MM(v)},{t:'HL',f:v=>N(v)},{t:'$ Neto/HL',f:v=>PH(v)},{t:'% Margen',f:v=>PCT(v,0),sign:1},{t:'TS',f:v=>MM(v,2)},{t:'% MG + TS',f:v=>PCT(v,0),sign:1}];
+const rentFoot = (r,lbl='Total') => [lbl,r.ne,r.hl,r.ph,r.pmb,r.ts,r.pmts];
+function monthAgg(rows){ const m=grp(rows,r=>r[0]*100+r[1],[4,5,6]); return k=>m.get(k)||[0,0,0]; }
+
+/* ---------- vistas ---------- */
+const V = {};
+
+V.resumen = () => {
+  const d=fD(), p=fP(), hl=sum(d,6), fin=sum(d,7), r=rentab(p), ccc=uniq(d,1);
+  const g=monthAgg(fM()), fac=HAB.length/HAB_TRANS;
+  const oc=g(YR*100+MC), ol=g(YA*100+MC); let y6=[0,0], y5=[0,0]; for(let m=1;m<=CER;m++){ const a=g(YR*100+m), b=g(YA*100+m); y6[0]+=a[0]; y6[1]+=a[1]; y5[0]+=b[0]; y5[1]+=b[1]; }
+  const full = st.d1===DIAS[0]&&st.d2===CORTE;
+  return `<div class="vh"><div><h1>Resumen del mes · ${mcn} ${YR}</h1><p>Lo que hay que mirar hoy: ritmo contra objetivo, comparación interanual sin distorsión por mes incompleto y dónde se pierde margen.</p></div></div>
+  <div class="grid k5">
+    <div class="card kpi"><div class="lab">HL vendidos</div><div class="val">${N(hl)}</div><div class="sub">${N(hl/HAB_TRANS)} HL por día hábil</div></div>
+    <div class="card kpi"><div class="lab">$ Final facturado</div><div class="val">${N(fin/1e6)}<small>M</small></div><div class="sub">Neto ${MM(r.ne,0)}</div></div>
+    <div class="card kpi"><div class="lab">$ Final por HL</div><div class="val">${N(fin/hl/1000)}<small>mil</small></div><div class="sub">Mínimo general $250 mil ${chip(fin/hl/250000-1)}</div></div>
+    <div class="card kpi"><div class="lab">Margen + TS</div><div class="val">${PCT(r.pmts,1)}</div><div class="sub">Margen bruto ${chip(r.pmb)} sin TS</div></div>
+    <div class="card kpi"><div class="lab">Clientes con compra</div><div class="val">${N(ccc)}</div><div class="sub">${N(hl/ccc,2)} HL por cliente</div></div>
+  </div>
+  <div class="grid g2">${paceCard(0)}${paceCard(1)}</div>
+  <div class="grid g2">
+   <div class="card"><h2>Comparación interanual comparable <small>volumen y precio neto · no aplica filtro de departamento ni de días</small></h2>
+    <div class="tw"><table class="yoy"><thead><tr><th>Período</th><th>HL ${YR}</th><th>HL ${YA}</th><th>Var. HL</th><th>$ Neto/HL ${YR}</th><th>Var. $/HL</th></tr></thead><tbody>
+     <tr><td>${MCN}, cierre proyectado</td><td>${N(oc[0]*fac)}</td><td>${N(ol[0])}</td><td>${chip(oc[0]*fac/ol[0]-1)}</td><td>${PH(oc[1]/oc[0])}</td><td>${chip((oc[1]/oc[0])/(ol[1]/ol[0])-1)}</td></tr>
+     <tr><td>${MCN}, a la fecha vs mes completo</td><td>${N(oc[0])}</td><td>${N(ol[0])}</td><td>${chip(oc[0]/ol[0]-1)}</td><td colspan="2" class="note">Comparación que muestra el acumulado original</td></tr>
+     <tr><td>Enero a ${MESL[CER-1].toLowerCase()}</td><td>${N(y6[0])}</td><td>${N(y5[0])}</td><td>${chip(y6[0]/y5[0]-1)}</td><td>${PH(y6[1]/y6[0])}</td><td>${chip((y6[1]/y6[0])/(y5[1]/y5[0])-1)}</td></tr>
+    </tbody></table></div>
+    <p class="note">La proyección extiende el promedio de HL por día hábil a los ${HAB.length} días hábiles de ${mcn} (lunes a sábado, ${feriadosTxt}). La variación de $/HL es nominal: para leer precio real conviene deflactar por IPC.</p></div>
+   <div class="card"><h2>Lectura del analista <small>con todos los datos, sin filtros</small></h2>
+    <ul class="ins">
+     <li><span class="sev warn"></span><p><b>Cerveza arranca noviembre con carga mayorista.</b> En dos días vendió 1.261 HL, 18% del objetivo de 7.000. El 84% fue al canal Mayorista, a $277 mil/HL final, debajo del mínimo de $320 mil. Es la carga típica de inicio de mes: la proyección lineal todavía no es representativa.</p></li>
+     <li><span class="sev bad"></span><p><b>UNG arranca lento y bajo precio.</b> Lleva 173 HL, 3,5% del objetivo de 4.950. Necesita 227 HL por día hábil, contra 131 de promedio en octubre. Se facturó entre $123 y $129 mil/HL, debajo del mínimo de $132 mil.</p></li>
+     <li><span class="sev warn"></span><p><b>El margen + TS arranca en 8,8%, debajo del 11,8% de octubre.</b> Lo explica el mix mayorista. Santos Hilda (153 HL, 2,7%) y Carletto Exequiel (144 HL, 5,3%) concentran 21% del volumen del mes.</p></li>
+     <li><span class="sev info"></span><p><b>Los objetivos de noviembre piden recuperar volumen.</b> Cerveza 7.000 HL (+18% sobre el cierre de octubre) y UNG 4.950 HL (+32%). Juntos quedan 6% debajo de lo vendido en noviembre de 2025.</p></li>
+    </ul></div>
+  </div>
+  ${full?'':'<p class="note">Hay un filtro de días activo: los KPIs del mes reflejan solo esos días.</p>'}`;
+};
+
+V.diario = () => {
+  const d=fD(), hl=sum(d,6), fin=sum(d,7);
+  const byDay=grp(d,r=>r[0],[6,7]), byDayUn=grp(d,r=>r[0]*10+Math.min(r[3],2),[6]);
+  const days=DIAS.filter(x=>x>=st.d1&&x<=st.d2);
+  const byCa=[...grp(d,r=>r[2],[6])].sort((a,b)=>b[1][0]-a[1][0]);
+  const byUn=[...grp(d,r=>r[3],[6])].sort((a,b)=>b[1][0]-a[1][0]);
+  const p0=pace(0), p1=pace(1);
+  // día anterior con venta, aunque quede fuera del período elegido
+  const allDay=grp(fD({d1:DIAS[0],d2:CORTE}),r=>r[0],[6,7]);
+  const prevOf=x=>{ const i=DIAS.indexOf(x); return i>0? DIAS[i-1] : null; };
+  const vs=x=>{ const a=allDay.get(x)||[0,0], pd=prevOf(x), b=pd? (allDay.get(pd)||[0,0]) : null; return {pd, hl:b&&b[0]? a[0]/b[0]-1 : NaN, fin:b&&b[1]? a[1]/b[1]-1 : NaN, a, b}; };
+  const ult=days[days.length-1], vu=vs(ult);
+  const ddPlug={id:'dd',afterDatasetsDraw(ch){ const {ctx}=ch; ctx.save(); ctx.font=`700 10.5px ${css('--f-body')}`; ctx.textAlign='center'; ctx.textBaseline='bottom';
+    days.forEach((x,i)=>{ const v=vs(x).hl; if(!isFinite(v)) return; let top=Infinity; for(let di=0;di<3;di++){ const el=ch.getDatasetMeta(di).data[i]; if(el && ch.data.datasets[di].data[i]>0) top=Math.min(top,el.y); }
+      if(!isFinite(top)) return; ctx.fillStyle = v>=0? css('--good') : css('--bad'); ctx.fillText((v>=0?'▲':'▼')+N(Math.abs(v*100),0)+'%', ch.getDatasetMeta(0).data[i].x, top-4); }); ctx.restore(); }};
+  setTimeout(()=>{
+    const o=baseOpts(), prom=hl/days.length;
+    mk('cDia',{type:'bar',data:{labels:days.map(diaLbl),datasets:[
+      {label:'Cerveza',data:days.map(x=>(byDayUn.get(x*10)||[0])[0]),backgroundColor:unColor(0),stack:'s',borderRadius:2},
+      {label:'UNG',data:days.map(x=>(byDayUn.get(x*10+1)||[0])[0]),backgroundColor:unColor(1),stack:'s',borderRadius:2},
+      {label:'Otras',data:days.map(x=>(byDayUn.get(x*10+2)||[0])[0]),backgroundColor:css('--c6'),stack:'s',borderRadius:2},
+      {type:'line',label:'Promedio diario',data:days.map(()=>prom),borderColor:css('--acc'),borderDash:[5,4],borderWidth:2,pointRadius:0}]},
+      plugins:[ddPlug],
+      options:{...o,layout:{padding:{top:18}},scales:{...o.scales,x:{...o.scales.x,stacked:true,ticks:{color:css('--muted'),maxRotation:0,autoSkip:true,callback:(v,i)=>days[i]}},y:{...o.scales.y,stacked:true,title:{display:true,text:'HL'}}},
+        plugins:{...o.plugins,tooltip:{...o.plugins.tooltip,callbacks:{label:c=>`${c.dataset.label}: ${N(c.raw)} HL`,footer:it=>{const x=days[it[0].dataIndex],a=byDay.get(x)||[0,0],w=vs(x);
+          const out=[`Total ${N(a[0])} HL · ${MM(a[1],1)} · ${PH(a[1]/a[0])}/HL`]; if(w.pd) out.push(`vs ${diaLbl(w.pd)}: HL ${SPCT(w.hl,1)} · $ final ${SPCT(w.fin,1)}`); return out;}}}}}});
+    const hb=(id,arr,lab,col)=>{ const tot=arr.reduce((s,a)=>s+a[1][0],0); mk(id,{type:'bar',data:{labels:arr.map(a=>lab(a[0])),datasets:[{data:arr.map(a=>a[1][0]),backgroundColor:col,borderRadius:3,maxBarThickness:26}]},
+      options:{...o,indexAxis:'y',interaction:{mode:'nearest',intersect:true},layout:{padding:{right:70}},scales:{x:{display:false,grid:{display:false}},y:{grid:{display:false},border:{display:false},ticks:{color:css('--text')}}},
+        plugins:{...o.plugins,vl:{fmt:v=>`${N(v)} · ${PCT(v/tot,0)}`},tooltip:{...o.plugins.tooltip,callbacks:{label:c=>`${N(c.raw)} HL (${PCT(c.raw/tot,1)})`}}}}}); };
+    hb('cCa',byCa,k=>CA[k],css('--navy')); hb('cUn',byUn,k=>UN[k],byUn.map(a=>unColor(a[0])));
+    const cli=grp(d,r=>r[1]+'|'+r[3],[6,7]);
+    table(document.getElementById('tCli'),[{t:'Cliente',l:1},{t:'Unidad',l:1},{t:'HL',f:v=>N(v,1)},{t:'$ Final',f:v=>MM(v,2)},{t:'$/HL',f:v=>PH(v)}],
+      [...cli].map(([k,a])=>{const [c,u]=k.split('|');return [X.clis[c],UNS[u],a[0],a[1],a[1]/a[0]]}),{sort:2,search:'Buscar cliente',limit:200,foot:['Total','',hl,fin,fin/hl]});
+    const tr=grp(d,r=>r[5],[6,7]), trc=new Map(); for(const r of d){ if(!trc.has(r[5])) trc.set(r[5],new Set()); trc.get(r[5]).add(r[1]); }
+    table(document.getElementById('tTr'),[{t:'Transporte',l:1},{t:'$ Final',f:v=>MM(v,1)},{t:'% del total',f:v=>PCT(v,1)},{t:'HL',f:v=>N(v)},{t:'Clientes',f:v=>N(v)},{t:'$/HL',f:v=>PH(v)}],
+      [...tr].map(([k,a])=>[X.trs[k],a[1],a[1]/fin,a[0],trc.get(k).size,a[1]/a[0]]),{sort:1,foot:['Total',fin,1,hl,uniq(d,1),fin/hl]});
+  });
+  return `<div class="vh"><div><h1>Seguimiento comercial diario</h1><p>Facturación y volumen del mes con avance contra objetivo. El gráfico separa cada día por unidad de negocio y marca el promedio.</p></div></div>
+  <div class="grid k5">
+   <div class="card kpi"><div class="lab">$ Final facturado</div><div class="val">${N(fin/1e6)}<small>M</small></div><div class="sub">${MM(fin/days.length)} por día</div></div>
+   <div class="card kpi"><div class="lab">HL vendidos</div><div class="val">${N(hl)}</div><div class="sub">${N(hl/days.length)} HL por día con venta</div></div>
+   <div class="card kpi cer"><div class="lab">Cerveza vs objetivo</div><div class="val">${PCT(p0.alc,1)}</div><div class="sub">${N(p0.real)} de ${N(p0.obj)} HL · tiempo ${PCT(p0.tiempo,0)}</div></div>
+   <div class="card kpi ung"><div class="lab">UNG vs objetivo</div><div class="val">${PCT(p1.alc,1)}</div><div class="sub">${N(p1.real)} de ${N(p1.obj)} HL · tiempo ${PCT(p1.tiempo,0)}</div></div>
+   <div class="card kpi"><div class="lab">Último día · ${diaLbl(ult)}</div><div class="val">${N(vu.a[0])}<small>HL</small></div><div class="sub">HL ${chip(vu.hl,true,0)} $ final ${chip(vu.fin,true,0)}</div><div class="sub">${vu.pd?`vs ${diaLbl(vu.pd)} (${N(vu.b[0])} HL · ${MM(vu.b[1],1)})`:'sin día anterior'}</div></div>
+  </div>
+  <div class="card"><h2>HL vendidos por día <small>apilado por unidad de negocio · etiqueta: variación de HL vs día anterior con venta</small></h2>
+   <div class="legend"><span><i style="background:var(--cer)"></i>Cerveza</span><span><i style="background:var(--ung)"></i>UNG</span><span><i style="background:var(--c6)"></i>Otras</span><span><i class="dash" style="border-color:var(--acc)"></i>Promedio diario</span></div>
+   <div class="chart"><canvas id="cDia" role="img" aria-label="HL vendidos por día"></canvas></div></div>
+  <div class="grid g2">
+   <div class="card"><h2>HL por canal</h2><div class="chart short"><canvas id="cCa"></canvas></div></div>
+   <div class="card"><h2>HL por unidad de negocio</h2><div class="chart short"><canvas id="cUn"></canvas></div></div>
+  </div>
+  <div class="grid g2">
+   <div class="card"><h2>Clientes por HL <small>con $ final y $/HL</small></h2><div id="tCli"></div></div>
+   <div class="card"><h2>Transporte · efectivo por chofer</h2><div id="tTr"></div></div>
+  </div>`;
+};
+
+V.acumulado = () => {
+  const g=monthAgg(fM()), fac=HAB.length/HAB_TRANS, ms=[...Array(MC)].map((_,i)=>i+1), LI=MC-1;
+  const h6=ms.map(m=>g(YR*100+m)[0]), h5=ms.map(m=>g(YA*100+m)[0]), n6=ms.map(m=>g(YR*100+m)[1]), n5=ms.map(m=>g(YA*100+m)[1]), f6=ms.map(m=>g(YR*100+m)[2]);
+  const s=a=>a.reduce((x,y)=>x+y,0), s9=a=>s(a.slice(0,CER));
+  const ccc6=ms.map(m=>X.CCC[YR+'-'+m]), ccc5=ms.map(m=>X.CCC[YA+'-'+m]);
+  const yr=X.M.filter(r=>r[0]===YR&&(st.ca<0||r[3]===st.ca)&&(st.un<0||r[2]===st.un));
+  const byUn=[...grp(yr,r=>r[2],[4])].sort((a,b)=>b[1][0]-a[1][0]), byCa=[...grp(yr,r=>r[3],[4])].sort((a,b)=>b[1][0]-a[1][0]), tot=s(h6);
+  setTimeout(()=>{
+    const o=baseOpts();
+    mk('cAcHl',{type:'bar',data:{labels:ms.map(m=>MES[m-1]),datasets:[
+      {label:'HL '+YR,data:h6,backgroundColor:css('--navy'),stack:'a',borderRadius:{topLeft:3,topRight:3},order:2},
+      {label:'Proyección resto de '+mcn,data:ms.map((m,i)=>i===LI?h6[LI]*(fac-1):null),backgroundColor:'transparent',borderColor:css('--navy'),borderWidth:1.5,borderDash:[4,3],stack:'a',order:2},
+      {type:'line',label:'HL '+YA,data:h5,borderColor:css('--c6'),backgroundColor:css('--c6'),borderWidth:2,borderDash:[2,3],pointRadius:4,order:1}]},
+      options:{...o,scales:{...o.scales,x:{...o.scales.x,stacked:true},y:{...o.scales.y,stacked:true,title:{display:true,text:'HL'}}},
+       plugins:{...o.plugins,vl:{only:0,inside:1,fmt:(v,i)=>{const b=i===LI?h6[LI]*fac:v;return SPCT(b/h5[i]-1,0)}},tooltip:{...o.plugins.tooltip,filter:c=>c.raw!=null,callbacks:{label:c=>`${c.dataset.label}: ${N(c.raw)} HL`,footer:it=>{const i=it[0].dataIndex;return i===LI?`${MES[LI]} proyectado ${N(h6[LI]*fac)} HL · ${SPCT(h6[LI]*fac/h5[LI]-1)} vs ${YA}`:`${SPCT(h6[i]/h5[i]-1)} vs ${YA}`}}}}}});
+    mk('cAcN',{type:'bar',data:{labels:ms.map(m=>MES[m-1]),datasets:[
+      {label:'Neto '+YA,data:n5.map(v=>v/1e6),backgroundColor:css('--c6'),borderRadius:3,maxBarThickness:22},
+      {label:'Neto '+YR,data:n6.map(v=>v/1e6),backgroundColor:css('--navy'),borderRadius:3,maxBarThickness:22}]},
+      options:{...o,scales:{...o.scales,y:{...o.scales.y,title:{display:true,text:'$ M (nominal)'}}},plugins:{...o.plugins,tooltip:{...o.plugins.tooltip,callbacks:{label:c=>`${c.dataset.label}: $${N(c.raw,0)} M`}}}}});
+    mk('cCcc',{type:'line',data:{labels:ms.map(m=>MES[m-1]),datasets:[
+      {label:String(YR),data:ccc6,borderColor:css('--navy'),backgroundColor:css('--navy'),borderWidth:2,pointRadius:3},
+      {label:String(YA),data:ccc5,borderColor:css('--c6'),backgroundColor:css('--c6'),borderWidth:2,borderDash:[2,3],pointRadius:3}]},
+      options:{...o,plugins:{...o.plugins,tooltip:{...o.plugins.tooltip,callbacks:{label:c=>`${c.dataset.label}: ${N(c.raw)} clientes`}}}}});
+    const hb=(id,arr,lab,col)=>{ const t=arr.reduce((x,a)=>x+a[1][0],0); mk(id,{type:'bar',data:{labels:arr.map(a=>lab(a[0])),datasets:[{data:arr.map(a=>a[1][0]),backgroundColor:col,borderRadius:3,maxBarThickness:24}]},
+      options:{...o,indexAxis:'y',interaction:{mode:'nearest',intersect:true},layout:{padding:{right:80}},scales:{x:{display:false},y:{grid:{display:false},border:{display:false},ticks:{color:css('--text')}}},
+       plugins:{...o.plugins,vl:{fmt:v=>`${PCT(v/t,0)} · ${N(v/1000,1)} mil`},tooltip:{...o.plugins.tooltip,callbacks:{label:c=>`${N(c.raw)} HL (${PCT(c.raw/t,1)})`}}}}}); };
+    hb('cAcUn',byUn,k=>UN[k],byUn.map(a=>unColor(a[0]))); hb('cAcCa',byCa,k=>CA[k],css('--navy'));
+  });
+  const cccA6=s9(ccc6)/CER, cccA5=s9(ccc5)/CER;
+  return `<div class="vh"><div><h1>Seguimiento comercial acumulado ${YR}</h1><p>Enero a ${mcn}. Las variaciones se calculan sobre meses cerrados; ${mcn} se muestra con su proyección a fin de mes. Este tablero no tiene apertura por departamento ni por día.</p></div></div>
+  <div class="grid k5">
+   <div class="card kpi"><div class="lab">HL vendidos</div><div class="val">${N(tot)}</div><div class="sub">${rangoCerr} ${chip(s9(h6)/s9(h5)-1)} vs ${YA}</div></div>
+   <div class="card kpi"><div class="lab">Clientes con compra / mes</div><div class="val">${N(cccA6)}</div><div class="sub">Promedio ${rangoCerr} ${chip(cccA6/cccA5-1)}</div></div>
+   <div class="card kpi"><div class="lab">$ Neto facturado</div><div class="val">${N(s(n6)/1e6)}<small>M</small></div><div class="sub">${rangoCerr} ${chip(s9(n6)/s9(n5)-1)} nominal</div></div>
+   <div class="card kpi"><div class="lab">$ Final facturado</div><div class="val">${N(s(f6)/1e6)}<small>M</small></div><div class="sub">$ Neto/HL ${PH(s(n6)/tot)}</div></div>
+   <div class="card kpi"><div class="lab">HL por cliente / mes</div>${(st.un<0&&st.ca<0)?`<div class="val">${N(s9(h6)/s9(ccc6),2)}</div><div class="sub">${rangoCerr} · ${YA}: ${N(s9(h5)/s9(ccc5),2)} ${chip((s9(h6)/s9(ccc6))/(s9(h5)/s9(ccc5))-1)}</div>`:`<div class="val">–</div><div class="sub">Disponible sin filtros de unidad o canal</div>`}</div>
+  </div>
+  <div class="card"><h2>HL vendidos por mes <small>etiqueta: variación vs mismo mes ${YA} (${mcn} proyectado)</small></h2>
+   <div class="legend"><span><i style="background:var(--navy)"></i>${YR}</span><span><i class="dash" style="border-color:var(--navy)"></i>Proyección resto de ${mcn}</span><span><i class="dash" style="border-color:var(--c6)"></i>${YA}</span></div>
+   <div class="chart"><canvas id="cAcHl"></canvas></div></div>
+  <div class="grid g2">
+   <div class="card"><h2>$ Neto facturado por mes <small>millones de pesos, nominal</small></h2><div class="legend"><span><i style="background:var(--c6)"></i>${YA}</span><span><i style="background:var(--navy)"></i>${YR}</span></div><div class="chart short"><canvas id="cAcN"></canvas></div></div>
+   <div class="card"><h2>Clientes con compra por mes <small>sin filtros: el dato viene consolidado</small></h2><div class="legend"><span><i class="ln" style="background:var(--navy)"></i>${YR}</span><span><i class="dash" style="border-color:var(--c6)"></i>${YA}</span></div><div class="chart short"><canvas id="cCcc"></canvas></div></div>
+  </div>
+  <div class="grid g2">
+   <div class="card"><h2>HL acumulado por unidad de negocio</h2><div class="chart short"><canvas id="cAcUn"></canvas></div></div>
+   <div class="card"><h2>Peso acumulado por canal</h2><div class="chart short"><canvas id="cAcCa"></canvas></div></div>
+  </div>
+  <p class="note">El tablero original suma los clientes con compra de cada mes (19.484). Un mismo cliente se cuenta una vez por mes, por eso aquí se muestra el promedio mensual.</p>`;
+};
+
+V.preciodiario = () => {
+  const base = fD({un:-1}), mins=X.minimos, days=DIAS.filter(x=>x>=st.d1&&x<=st.d2);
+  const sets=[['General',r=>st.un<0||r[3]===st.un,mins.gen,'--navy'],['Cerveza',r=>r[3]===0,mins.cer,'--cer'],['UNG',r=>r[3]===1,mins.ung,'--ung']].map(([n,f,mn,col])=>{
+    const rows=base.filter(f), hl=sum(rows,6), fin=sum(rows,7), bd=grp(rows,r=>r[0],[6,7]);
+    const ser=days.map(d=>{const a=bd.get(d);return a&&a[0]>0?a[1]/a[0]/1000:null});
+    let bajo=0,gap=0; for(const d of days){const a=bd.get(d); if(!a||!a[0]) continue; if(a[1]/a[0]<mn*1000){bajo++; gap+=mn*1000*a[0]-a[1];}}
+    const ca=[...grp(rows,r=>r[2],[7,6])].sort((a,b)=>String(CA[a[0]]).localeCompare(CA[b[0]]));
+    return {n,mn,col,hl,fin,ph:fin/hl,ser,bajo,gap,ca};
+  });
+  setTimeout(()=>{ const o=baseOpts(); sets.forEach((s,i)=>{
+    mk('cPd'+i,{type:'line',data:{labels:days.map(diaLbl),datasets:[
+      {label:'$/HL',data:s.ser,borderColor:css(s.col),backgroundColor:s.ser.map(v=>v!=null&&v<s.mn?css('--bad'):css(s.col)),pointRadius:4,pointBorderColor:css('--surface'),pointBorderWidth:1.5,borderWidth:2,spanGaps:true},
+      {label:'Mínimo',data:days.map(()=>s.mn),borderColor:css('--muted'),borderDash:[5,4],borderWidth:1.5,pointRadius:0}]},
+      options:{...o,scales:{...o.scales,x:{...o.scales.x,ticks:{color:css('--muted'),maxRotation:0,callback:(v,j)=>days[j]}},y:{...o.scales.y,ticks:{color:css('--muted'),callback:v=>'$'+N(v)}}},
+       plugins:{...o.plugins,tooltip:{...o.plugins.tooltip,callbacks:{label:c=>`${c.dataset.label}: $${N(c.raw)} mil/HL`}}}}});
+    table(document.getElementById('tPd'+i),[{t:'Canal',l:1},{t:'$ Final',f:v=>MM(v,1)},{t:'HL',f:v=>N(v)},{t:'$/HL',f:v=>PH(v)},{t:'vs mínimo',f:v=>SPCT(v,0),sign:1}],
+      s.ca.map(([k,a])=>[CA[k],a[0],a[1],a[0]/a[1],a[0]/a[1]/(s.mn*1000)-1]),{sort:0,dir:1,foot:['Total',s.fin,s.hl,s.ph,s.ph/(s.mn*1000)-1]});
+  }); });
+  return `<div class="vh"><div><h1>Ventas diarias · $/HL vs mínimo</h1><p>Valores finales en miles de pesos por HL. Los puntos rojos son días por debajo del mínimo. La brecha estima cuánto más se habría facturado si esos días hubieran vendido al mínimo.</p></div></div>
+  <div class="grid g3">${sets.map(s=>`<div class="card kpi ${s.n==='Cerveza'?'cer':s.n==='UNG'?'ung':''}"><div class="lab">$/HL ${s.n.toLowerCase()} · mínimo $${N(s.mn)} mil</div><div class="val">${N(s.ph/1000)}<small>mil</small></div>
+    <div class="sub"><span class="chip ${s.ph>=s.mn*1000?'good':'bad'}">${PCT(s.ph/(s.mn*1000),1)} del mínimo</span><span class="chip ${s.bajo?'bad':'good'}">${s.bajo} de ${days.length} días bajo mínimo</span></div>
+    <div class="sub">Brecha de precio en esos días: <b style="color:var(--ink)">${MM(s.gap,1)}</b></div></div>`).join('')}</div>
+  ${sets.map((s,i)=>`<div class="grid g21"><div class="card"><h2>$/HL ${s.n.toLowerCase()} por día <small>línea punteada: mínimo $${N(s.mn)} mil</small></h2><div class="chart short"><canvas id="cPd${i}"></canvas></div></div>
+   <div class="card"><h2>${s.n} por canal</h2><div id="tPd${i}"></div></div></div>`).join('')}`;
+};
+
+V.preciomensual = () => {
+  const sel = st.pm || MC;
+  const rows=X.M.filter(r=>st.ca<0||r[3]===st.ca);
+  const cut=(f)=>{ const m=grp(rows.filter(f),r=>r[0]*100+r[1],[4,5]); return k=>{const a=m.get(k);return a&&a[0]?a[1]/a[0]/1000:NaN}; };
+  const G=cut(r=>st.un<0||r[2]===st.un), C=cut(r=>r[2]===0), U=cut(r=>r[2]===1), ms=[...Array(MC)].map((_,i)=>i+1);
+  const card=(n,fn,cls)=>{const v=fn(YR*100+sel), ma=fn(YR*100+sel-1), aa=fn(YA*100+sel);
+    return `<div class="card kpi ${cls}"><div class="lab">Precio neto / HL ${n}</div><div class="val">${N(v)}<small>mil</small></div><div class="sub">vs mes anterior ${chip(v/ma-1)}</div><div class="sub">vs ${MES[sel-1]} ${YA} ${chip(v/aa-1)}<span>nominal</span></div></div>`};
+  const canals=[0,2,1,3];
+  setTimeout(()=>{ const o=baseOpts();
+    mk('cPm',{type:'line',data:{labels:ms.map(m=>MES[m-1]),datasets:[
+      {label:'Cerveza',data:ms.map(m=>C(YR*100+m)),borderColor:css('--cer'),backgroundColor:css('--cer'),borderWidth:2,pointRadius:ms.map(m=>m===sel?6:3)},
+      {label:'General',data:ms.map(m=>G(YR*100+m)),borderColor:css('--navy'),backgroundColor:css('--navy'),borderWidth:2,pointRadius:ms.map(m=>m===sel?6:3)},
+      {label:'UNG',data:ms.map(m=>U(YR*100+m)),borderColor:css('--ung'),backgroundColor:css('--ung'),borderWidth:2,pointRadius:ms.map(m=>m===sel?6:3)},
+      {label:'General '+YA,data:ms.map(m=>G(YA*100+m)),borderColor:css('--c6'),borderDash:[2,3],borderWidth:1.5,pointRadius:0}]},
+      options:{...o,scales:{...o.scales,y:{...o.scales.y,ticks:{color:css('--muted'),callback:v=>'$'+N(v)},title:{display:true,text:'miles de $ por HL'}}},plugins:{...o.plugins,tooltip:{...o.plugins.tooltip,callbacks:{label:c=>`${c.dataset.label}: $${N(c.raw)} mil`}}}}});
+    const cr=X.M.filter(r=>r[0]===YR); const cc=(ca,u,m)=>{let h=0,n=0;for(const r of cr){if(r[1]===m&&r[3]===ca&&(u<0?(st.un<0||r[2]===st.un):r[2]===u)){h+=r[4];n+=r[5]}}return h?n/h/1000:NaN};
+    mk('cPmC',{type:'bar',data:{labels:canals.map(c=>CANAL_NOMBRE[CA[c]]),datasets:[['General',-1,'--navy'],['Cerveza',0,'--cer'],['UNG',1,'--ung']].map(([n,u,col])=>({label:n,data:canals.map(c=>cc(c,u,sel)),backgroundColor:css(col),borderRadius:3,maxBarThickness:30}))},
+      options:{...o,interaction:{mode:'index',intersect:false},scales:{...o.scales,y:{...o.scales.y,ticks:{color:css('--muted'),callback:v=>'$'+N(v)}}},plugins:{...o.plugins,vl:{top:1,fmt:v=>N(v)},tooltip:{...o.plugins.tooltip,callbacks:{label:c=>{const ca=canals[c.dataIndex],u=[-1,0,1][c.datasetIndex];return `${c.dataset.label}: $${N(c.raw)} mil · ${SPCT(c.raw/cc(ca,u,sel-1)-1,0)} vs MA`}}}}}});
+    const tb=document.getElementById('tPm'); const rws=canals.map(c=>{const r=[CANAL_NOMBRE[CA[c]]];for(const u of [-1,0,1]){const v=cc(c,u,sel);r.push(v,v/cc(c,u,sel-1)-1)}return r});
+    table(tb,[{t:'Canal',l:1},{t:'General',f:v=>'$'+N(v)},{t:'vs MA',f:v=>SPCT(v,0),sign:1},{t:'Cerveza',f:v=>'$'+N(v)},{t:'vs MA',f:v=>SPCT(v,0),sign:1},{t:'UNG',f:v=>'$'+N(v)},{t:'vs MA',f:v=>SPCT(v,0),sign:1}],rws,{sort:0,dir:1});
+  });
+  setTimeout(()=>{ const s=document.getElementById('pmMes'); if(s){ s.value=sel; s.onchange=()=>{st.pm=+s.value; render();}; } });
+  return `<div class="vh"><div><h1>Precio de venta por HL</h1><p>Valores netos en miles de pesos por HL. Se agrega la comparación contra el mismo mes de ${YA} para separar estacionalidad de aumento de precio.</p></div>
+   <div class="filters" style="padding:0"><label for="pmMes">Mes<select id="pmMes">${[...Array(MC-1)].map((_,i)=>`<option value="${i+2}">${MESL[i+1]}</option>`).join('')}</select></label></div></div>
+  <div class="grid g3">${card('general',G,'')}${card('cerveza',C,'cer')}${card('UNG',U,'ung')}</div>
+  <div class="card"><h2>Evolución mensual ${YR} <small>punteado: general ${YA}</small></h2>
+   <div class="legend"><span><i class="ln" style="background:var(--cer)"></i>Cerveza</span><span><i class="ln" style="background:var(--navy)"></i>General</span><span><i class="ln" style="background:var(--ung)"></i>UNG</span><span><i class="dash" style="border-color:var(--c6)"></i>General ${YA}</span></div>
+   <div class="chart"><canvas id="cPm"></canvas></div></div>
+  <div class="grid g2">
+   <div class="card"><h2>$/HL por canal · ${MESL[sel-1]}</h2><div class="legend"><span><i style="background:var(--navy)"></i>General</span><span><i style="background:var(--cer)"></i>Cerveza</span><span><i style="background:var(--ung)"></i>UNG</span></div><div class="chart short"><canvas id="cPmC"></canvas></div></div>
+   <div class="card"><h2>Variación contra el mes anterior por canal</h2><div id="tPm"></div><p class="note">Mismo dato que las tarjetas por canal del tablero original, en una sola tabla para comparar.</p></div>
+  </div>`;
+};
+
+V.clientes = () => {
+  const p=fP(), r=rentab(p);
+  const cm=grp(p,r=>r[1],[6,7,8,9]), rows=rentRows(cm,k=>X.clis[k]);
+  const neg=rows.filter(x=>x[7]<0);
+  const srt=[...rows].sort((a,b)=>b[1]-a[1]); let acc=0,n80=0; const tot=r.ne; for(const x of srt){acc+=x[1]; n80++; if(acc>=tot*.8) break;}
+  const top20=srt.slice(0,20).reduce((s,x)=>s+x[1],0)/tot;
+  setTimeout(()=>{
+    table(document.getElementById('tRc'),rentCols('Cliente'),rows,{sort:1,search:'Buscar cliente',foot:rentFoot(r)});
+    table(document.getElementById('tRu'),rentCols('Unidad de negocio'),rentRows(grp(p,r=>r[4],[6,7,8,9]),k=>UN[k]),{sort:1,foot:rentFoot(r)});
+    table(document.getElementById('tRca'),rentCols('Canal'),rentRows(grp(p,r=>r[3],[6,7,8,9]),k=>CA[k]),{sort:1,foot:rentFoot(r)});
+    const o=baseOpts(), cut=t=>t.length>26?t.slice(0,25)+'…':t;
+    const rank=(id,list,col)=>mk(id,{type:'bar',data:{labels:list.map(x=>cut(x[0])),datasets:[{data:list.map(x=>Math.abs(x[7])/1e6),backgroundColor:col,borderRadius:3,maxBarThickness:16}]},
+      options:{...o,indexAxis:'y',interaction:{mode:'nearest',intersect:true,axis:'y'},layout:{padding:{right:96}},scales:{x:{display:false,beginAtZero:true},y:{grid:{display:false},border:{display:false},ticks:{color:css('--text'),font:{size:11},autoSkip:false}}},
+        plugins:{...o.plugins,vl:{fmt:(v,i)=>`${list[i][7]<0?'−':''}${v<1?'$'+N(v*1000,0)+' mil':'$'+N(v,1)+' M'} · ${PCT(list[i][6],0)}`},
+          tooltip:{...o.plugins.tooltip,callbacks:{title:it=>list[it[0].dataIndex][0],label:c=>{const x=list[c.dataIndex];return [`Resultado MG + TS: ${Math.abs(x[7])<1e6?(x[7]<0?'−':'')+'$'+N(Math.abs(x[7])/1000,0)+' mil':MM(x[7],2)} (${PCT(x[6],1)})`,`Venta neta ${MM(x[1],1)} · ${N(x[2],1)} HL`,`Margen bruto ${PCT(x[4],1)} · TS ${MM(x[5],2)}`]}}}}}});
+    rank('cPos',[...rows].filter(x=>x[7]>0).sort((a,b)=>b[7]-a[7]).slice(0,20),css('--navy'));
+    rank('cNeg',[...neg].sort((a,b)=>a[7]-b[7]).slice(0,20),css('--bad'));
+  });
+  return `<div class="vh"><div><h1>Rentabilidad comercial · clientes</h1><p>Margen bruto = venta neta − costo PNSF. Margen + TS suma el trade spend (acción centralizada, negociación y combos; excluye acción descentralizada) y se mide sobre neto + TS.</p></div></div>
+  ${kpisRent(r)}
+  <div class="grid g2">
+   <div class="card"><h2>20 clientes que más aportan <small>resultado margen + TS en $ · etiqueta: $ y % MG + TS</small></h2><div class="chart" style="height:520px"><canvas id="cPos" role="img" aria-label="Ranking de los 20 clientes con mayor resultado positivo"></canvas></div></div>
+   <div class="card"><h2>20 clientes que más restan <small>resultado margen + TS negativo, aun con trade spend · montos en miles</small></h2><div class="chart" style="height:520px"><canvas id="cNeg" role="img" aria-label="Ranking de los 20 clientes con mayor resultado negativo"></canvas></div></div>
+  </div>
+  <div class="card"><h2>Concentración y riesgo</h2><ul class="ins">
+    <li><span class="sev info"></span><p><b>${N(rows.length)} clientes</b> con venta en el período. Los 20 primeros explican <b>${PCT(top20,0)}</b> de la venta neta y hacen falta <b>${N(n80)}</b> para llegar al 80%.</p></li>
+    <li><span class="sev bad"></span><p><b>${N(neg.length)} clientes</b> tienen margen + TS negativo. Su resultado conjunto es <b>${MM(neg.reduce((s,x)=>s+x[7],0),1)}</b>; los 20 del ranking explican <b>${PCT([...neg].sort((a,b)=>a[7]-b[7]).slice(0,20).reduce((s,x)=>s+x[7],0)/neg.reduce((s,x)=>s+x[7],0),0)}</b> de esa pérdida.</p></li>
+    <li><span class="sev warn"></span><p><b>${N(rows.filter(x=>x[8]<0).length)} clientes</b> tienen margen bruto negativo antes del TS: el precio neto no cubre el PNSF.</p></li>
+   </ul></div>
+  <div class="card"><h2>Clientes por venta neta <small>$ en millones · ordená por cualquier columna</small></h2><div id="tRc"></div></div>
+  <div class="card"><h2>Rentabilidad por unidad de negocio</h2><div id="tRu"></div></div><div class="card"><h2>Rentabilidad por canal</h2><div id="tRca"></div></div>`;
+};
+function kpisRent(r){ return `<div class="grid k5">
+   <div class="card kpi"><div class="lab">Venta neta</div><div class="val">${N(r.ne/1e6)}<small>M</small></div><div class="sub">${PH(r.ph)} por HL</div></div>
+   <div class="card kpi"><div class="lab">Margen bruto</div><div class="val" style="color:${r.mb<0?'var(--bad)':'var(--ink)'}">${N(r.mb/1e6,1)}<small>M</small></div><div class="sub">${chip(r.pmb)} sobre venta neta</div></div>
+   <div class="card kpi"><div class="lab">PNSF / venta</div><div class="val">${PCT(r.ppn,1)}</div><div class="sub">Costo ${MM(r.pn,0)}</div></div>
+   <div class="card kpi"><div class="lab">Trade spend</div><div class="val">${N(r.ts/1e6,1)}<small>M</small></div><div class="sub">${PCT(r.ts/r.ne,1)} de la venta neta</div></div>
+   <div class="card kpi"><div class="lab">Margen + TS</div><div class="val" style="color:${r.mts<0?'var(--bad)':'var(--ink)'}">${PCT(r.pmts,1)}</div><div class="sub">${MM(r.mts,1)}</div></div></div>`; }
+
+V.productos = () => {
+  const p=fP(), r=rentab(p);
+  const pm=grp(p,r=>r[2],[6,7,8,9]), rows=rentRows(pm,k=>X.prods[k]);
+  const worst=rows.map(x=>[x[0],x[7],x[2],x[6]]).filter(x=>x[1]<0).sort((a,b)=>a[1]-b[1]);
+  setTimeout(()=>{
+    table(document.getElementById('tPr'),rentCols('Producto'),rows,{sort:2,search:'Buscar producto',foot:rentFoot(r)});
+    table(document.getElementById('tPca'),rentCols('Canal'),rentRows(grp(p,r=>r[3],[6,7,8,9]),k=>CA[k]),{sort:1,foot:rentFoot(r)});
+    table(document.getElementById('tPw'),[{t:'Producto',l:1},{t:'Resultado MG + TS',f:v=>MM(v,2),sign:1},{t:'HL',f:v=>N(v,1)},{t:'% MG + TS',f:v=>PCT(v,0),sign:1}],worst,{sort:1,dir:1,foot:['Total',worst.reduce((s,x)=>s+x[1],0),worst.reduce((s,x)=>s+x[2],0),null]});
+    const o=baseOpts(); const steps=[['Venta neta',0,r.ne,'--navy'],['+ Trade spend',r.ne,r.ne+r.ts,'--good'],['− Costo PNSF',r.ne+r.ts,r.mts,'--bad'],['Margen + TS',0,r.mts,'--acc']];
+    mk('cWf',{type:'bar',data:{labels:steps.map(s=>s[0]),datasets:[{data:steps.map(s=>[s[1]/1e6,s[2]/1e6]),backgroundColor:steps.map(s=>css(s[3])),borderRadius:3,maxBarThickness:70}]},
+      options:{...o,interaction:{mode:'nearest',intersect:true},scales:{...o.scales,y:{...o.scales.y,ticks:{color:css('--muted'),callback:v=>'$'+N(v)},title:{display:true,text:'$ M'}}},
+       plugins:{...o.plugins,vl:{fmt:(v,i)=>{const d=(v[1]-v[0]);return (i===2?'−':'')+'$'+N(Math.abs(d),0)+' M'}},tooltip:{...o.plugins.tooltip,callbacks:{label:c=>`$${N(Math.abs(c.raw[1]-c.raw[0]),1)} M`}}}}});
+  });
+  return `<div class="vh"><div><h1>Rentabilidad comercial · productos</h1><p>Mismo criterio de margen que la vista de clientes, abierto por SKU. El puente muestra cómo el trade spend compensa un costo PNSF mayor que la venta neta.</p></div></div>
+  ${kpisRent(r)}
+  <div class="grid g2">
+   <div class="card"><h2>Puente de margen <small>millones de pesos</small></h2><div class="chart"><canvas id="cWf"></canvas></div></div>
+   <div class="card"><h2>Productos con resultado negativo <small>${worst.length} SKU · aun con TS</small></h2><div id="tPw"></div></div>
+  </div>
+  <div class="card"><h2>Productos por HL <small>$ en millones</small></h2><div id="tPr"></div></div>
+  <div class="card"><h2>Rentabilidad por canal</h2><div id="tPca"></div></div>`;
+};
+
+/* ---------- navegación ---------- */
+function render(){
+  killCharts();
+  document.querySelectorAll('#tabs a').forEach(a=>a.setAttribute('aria-current', a.getAttribute('href')==='#'+st.view?'page':'false'));
+  const mainEl=document.getElementById('main'); mainEl.innerHTML = `<section class="view">${V[st.view]()}</section>`;
+}
+function fromHash(){ const h=location.hash.slice(1); st.view = V[h]? h : 'resumen'; try{localStorage.setItem('zuppa-view',st.view)}catch(e){} render(); }
+document.querySelectorAll('#tabs a').forEach(a=>a.addEventListener('click',e=>{ e.preventDefault(); const v=a.getAttribute('href').slice(1); history.replaceState(null,'','#'+v); st.view=v; try{localStorage.setItem('zuppa-view',v)}catch(_){} render(); window.scrollTo(0,0); }));
+window.addEventListener('hashchange',fromHash);
+if(!location.hash){ try{ const v=localStorage.getItem('zuppa-view'); if(v&&V[v]) st.view=v; }catch(e){} }
+else st.view = V[location.hash.slice(1)]? location.hash.slice(1) : 'resumen';
+render();
+</script>
+
+</body>
+</html>
