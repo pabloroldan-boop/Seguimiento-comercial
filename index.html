@@ -169,7 +169,7 @@ td .bar-in{display:inline-block;height:6px;border-radius:3px;background:var(--na
   </div>
 </header>
 
-<main class="wrap" id="main"><p class="note">Cargando el tablero… (versión del 04/11, con servicio de datos)</p></main>
+<main class="wrap" id="main"><p class="note">Cargando el tablero… (versión del 04/11)</p></main>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script>
@@ -181,14 +181,19 @@ function avisoError(titulo, detalle){
   el.querySelector('h2').textContent=titulo; el.querySelector('p').textContent=detalle;
 }
 (function(){
-  const q=new URLSearchParams(location.search), api=q.get('api'), k=q.get('k');
+  // Dirección del servicio de datos (Apps Script). Si alguna vez cambia, se reemplaza acá o se pasa con ?api=
+  const API_DEF='https://script.google.com/macros/s/AKfycbw_rWLbYPKEEe7grVSIZfZApiR_Gzv9Ra2y36QSQXmFoHzPu9uqloUq0wpE8Q1E5EUAzw/exec';
+  const q=new URLSearchParams(location.search), api=q.get('api')||API_DEF;
+  let k=q.get('k');
+  try{ if(k) localStorage.setItem('zuppa-llave',k); else k=localStorage.getItem('zuppa-llave'); }catch(e){}
+  window.__llaveGuardada = !q.get('k');
   if(!api||!k){ avisoError('Falta la llave del tablero','Abrí el tablero con el link completo que se genera desde la planilla (menú Tablero Zuppa → 3. Generar link del tablero).'); return; }
   if(!/^https:\/\/script\.google(usercontent)?\.com\//.test(api)){ avisoError('El link no es válido','La dirección del servicio de datos tiene que ser la de la aplicación web de Apps Script (termina en /exec).'); return; }
   document.getElementById('main').innerHTML='<p class="note">Cargando datos…</p>';
   const s=document.createElement('script');
   s.src=api+(api.indexOf('?')<0?'?':'&')+'k='+encodeURIComponent(k)+'&t='+Date.now();
   s.onload=function(){
-    if(window.DATA_ERROR){ avisoError('No se pudieron cargar los datos', window.DATA_ERROR); return; }
+    if(window.DATA_ERROR){ if(/llave/.test(window.DATA_ERROR)){ try{localStorage.removeItem('zuppa-llave')}catch(e){} } avisoError('No se pudieron cargar los datos', window.DATA_ERROR); return; }
     if(!window.DATA){ avisoError('No se pudieron cargar los datos','El servicio respondió sin datos. Revisá que la aplicación web esté implementada con acceso "Cualquier persona".'); return; }
     const app=document.createElement('script'); app.textContent=document.getElementById('app').textContent; document.body.appendChild(app);
   };
