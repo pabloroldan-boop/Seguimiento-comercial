@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
-<meta name="description" content="Seguimiento comercial diario de Zuppa Distribuidora: ventas, precio por HL y rentabilidad.">
+<meta name="referrer" content="no-referrer">
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20120%2084%22%20role%3D%22img%22%20aria-label%3D%22Zuppa%20distribuidora%22%3E%0A%20%20%3Cdefs%3E%3ClinearGradient%20id%3D%22zg%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%220.35%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22%23e3242b%22/%3E%3Cstop%20offset%3D%22.55%22%20stop-color%3D%22%23cf1f26%22/%3E%3Cstop%20offset%3D%22.78%22%20stop-color%3D%22%234a1416%22/%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23111%22/%3E%3C/linearGradient%3E%3C/defs%3E%0A%20%20%3Cpath%20fill%3D%22url%28%23zg%29%22%20d%3D%22M79%202%20C87%2023%2077%2043%2059%2043%20C48.5%2043%2041%2037.5%2037.5%2029%20L45%2026.5%20C48%2032%2052.5%2035%2059%2035%20C71.5%2035%2081.5%2022%2079%202%20Z%22/%3E%0A%20%20%3Cpath%20fill%3D%22%23e3242b%22%20d%3D%22M32%2013%20L49.5%2022%20L36.5%2032.5%20Z%22/%3E%0A%20%20%3Ctext%20x%3D%2260%22%20y%3D%2266%22%20text-anchor%3D%22middle%22%20font-family%3D%22Arial%20Black%2CArial%2CHelvetica%2Csans-serif%22%20font-weight%3D%22900%22%20font-size%3D%2224%22%20letter-spacing%3D%220.5%22%20fill%3D%22%23141414%22%3EZUPPA%3C/text%3E%0A%20%20%3Ctext%20x%3D%2260%22%20y%3D%2279%22%20text-anchor%3D%22middle%22%20font-family%3D%22Arial%2CHelvetica%2Csans-serif%22%20font-size%3D%228.2%22%20letter-spacing%3D%222.6%22%20fill%3D%22%239a9a9a%22%3Edistribuidora%3C/text%3E%0A%3C/svg%3E">
 <style>
 html{-webkit-text-size-adjust:100%}
@@ -172,8 +172,45 @@ td .bar-in{display:inline-block;height:6px;border-radius:3px;background:var(--na
 <main class="wrap" id="main"></main>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<script src="data.js"></script>
 <script>
+/* Carga de datos: el link trae ?api=<servicio de Apps Script>&k=<llave> */
+function avisoError(titulo, detalle){
+  if (window.__avisoMostrado) return; window.__avisoMostrado = true;
+  const el=document.getElementById('main');
+  el.innerHTML='<div class="card" style="max-width:720px;margin-top:8px"><h2></h2><p style="margin:0 0 8px"></p><p class="note" style="margin:0">Si el problema sigue, mandá una captura de este mensaje.</p></div>';
+  el.querySelector('h2').textContent=titulo; el.querySelector('p').textContent=detalle;
+}
+(function(){
+  const q=new URLSearchParams(location.search), api=q.get('api'), k=q.get('k');
+  if(!api||!k){ avisoError('Falta la llave del tablero','Abrí el tablero con el link completo que se genera desde la planilla (menú Tablero Zuppa → 3. Generar link del tablero).'); return; }
+  if(!/^https:\/\/script\.google(usercontent)?\.com\//.test(api)){ avisoError('El link no es válido','La dirección del servicio de datos tiene que ser la de la aplicación web de Apps Script (termina en /exec).'); return; }
+  document.getElementById('main').innerHTML='<p class="note">Cargando datos…</p>';
+  const s=document.createElement('script');
+  s.src=api+(api.indexOf('?')<0?'?':'&')+'k='+encodeURIComponent(k)+'&t='+Date.now();
+  s.onload=function(){
+    if(window.DATA_ERROR){ avisoError('No se pudieron cargar los datos', window.DATA_ERROR); return; }
+    if(!window.DATA){ avisoError('No se pudieron cargar los datos','El servicio respondió sin datos. Revisá que la aplicación web esté implementada con acceso "Cualquier persona".'); return; }
+    const app=document.createElement('script'); app.textContent=document.getElementById('app').textContent; document.body.appendChild(app);
+  };
+  s.onerror=function(){ avisoError('No se pudo conectar con el servicio de datos','Revisá que la aplicación web de Apps Script esté implementada como "Cualquier persona" y que el link sea el actual.'); };
+  document.head.appendChild(s);
+})();
+</script>
+<script type="text/plain" id="app">
+function avisoError(titulo, detalle){
+  if (window.__avisoMostrado) return; window.__avisoMostrado = true;
+  const el=document.getElementById('main');
+  el.innerHTML=`<div class="card" style="max-width:720px;margin-top:8px"><h2>${titulo}</h2><p style="margin:0 0 8px">${detalle}</p><p class="note" style="margin:0">Si el problema sigue, mandá una captura de este mensaje.</p></div>`;
+}
+window.addEventListener('error', e => avisoError('El tablero encontró un error', `${e.message||'Error desconocido'}${e.filename?` (${e.filename.split('/').pop()}, línea ${e.lineno})`:''}`));
+if (!window.DATA) {
+  avisoError('No se pudieron cargar los datos', 'La página no encontró el archivo <b>data.js</b> o el archivo está incompleto. Revisá que esté en la raíz del repositorio, junto a index.html, con ese nombre exacto (en minúsculas y sin "(1)" ni otra extensión), y que el último commit de GitHub haya terminado de publicarse en Netlify.');
+  throw new Error('data.js no cargado');
+}
+if (typeof Chart === 'undefined') {
+  avisoError('No se pudo cargar la librería de gráficos', 'El navegador no pudo descargar Chart.js desde cdnjs.cloudflare.com. Puede ser un bloqueo de la red de la empresa o falta de conexión.');
+  throw new Error('Chart.js no cargado');
+}
 const X = window.DATA;
 const UN = X.uns, CA = X.canals, UNS=['Cerveza','UNG','Aguas','Vino','Marketplace','Adyacencias'];
 const MES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
