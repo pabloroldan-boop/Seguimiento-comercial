@@ -125,6 +125,15 @@ td .bar-in{display:inline-block;height:6px;border-radius:3px;background:var(--na
 .ins li b{color:var(--ink)}
 .sev{width:9px;height:9px;border-radius:50%;margin-top:6px}
 .sev.bad{background:var(--bad)} .sev.warn{background:var(--warn)} .sev.good{background:var(--good)} .sev.info{background:var(--navy)}
+.exe .top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.exe .val{font-size:36px}
+.exe .sub b{color:var(--ink)}
+.k3{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media (max-width:980px){.k3{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.k3{grid-template-columns:minmax(0,1fr)}}
+.titular{font-size:16px;color:var(--text);max-width:85ch;margin:6px 0 0;line-height:1.5}
+.titular b{color:var(--ink)}
+.fechada{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
 .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-bottom:6px}
 .legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
 .legend i.ln{height:2px;border-radius:0;vertical-align:3px;width:14px}
@@ -149,7 +158,8 @@ td .bar-in{display:inline-block;height:6px;border-radius:3px;background:var(--na
   <text x="60" y="79" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="8.2" letter-spacing="2.6" fill="#9a9a9a">distribuidora</text>
 </svg><span>Seguimiento<br>comercial</span></div>
       <nav class="tabs" id="tabs" aria-label="Vistas">
-        <a href="#resumen">Resumen<span class="new">nuevo</span></a>
+        <a href="#ejecutivo">Ejecutivo<span class="new">nuevo</span></a>
+        <a href="#resumen">Resumen</a>
         <a href="#diario">Diario</a>
         <a href="#acumulado">Acumulado</a>
         <a href="#preciodiario">$/HL diario</a>
@@ -169,7 +179,7 @@ td .bar-in{display:inline-block;height:6px;border-radius:3px;background:var(--na
   </div>
 </header>
 
-<main class="wrap" id="main"><p class="note">Cargando el tablero… (versión del 04/11)</p></main>
+<main class="wrap" id="main"><p class="note">Cargando el tablero… (versión 3 · 04/11)</p></main>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script>
@@ -184,20 +194,44 @@ function avisoError(titulo, detalle){
   // Dirección del servicio de datos (Apps Script). Si alguna vez cambia, se reemplaza acá o se pasa con ?api=
   const API_DEF='https://script.google.com/macros/s/AKfycbw_rWLbYPKEEe7grVSIZfZApiR_Gzv9Ra2y36QSQXmFoHzPu9uqloUq0wpE8Q1E5EUAzw/exec';
   const q=new URLSearchParams(location.search), api=q.get('api')||API_DEF;
+  const ls={get:n=>{try{return localStorage.getItem(n)}catch(e){return null}}, set:(n,v)=>{try{localStorage.setItem(n,v)}catch(e){}}, del:n=>{try{localStorage.removeItem(n)}catch(e){}}};
   let k=q.get('k');
-  try{ if(k) localStorage.setItem('zuppa-llave',k); else k=localStorage.getItem('zuppa-llave'); }catch(e){}
-  window.__llaveGuardada = !q.get('k');
-  if(!api||!k){ avisoError('Falta la llave del tablero','Abrí el tablero con el link completo que se genera desde la planilla (menú Tablero Zuppa → 3. Generar link del tablero).'); return; }
+  if(k) ls.set('zuppa-llave',k); else k=ls.get('zuppa-llave');
+  if(!k){ avisoError('Falta la llave del tablero','Abrí el tablero con el link completo que se genera desde la planilla (menú Tablero Zuppa → 3. Generar link del tablero). Después de la primera vez, este navegador la recuerda.'); return; }
   if(!/^https:\/\/script\.google(usercontent)?\.com\//.test(api)){ avisoError('El link no es válido','La dirección del servicio de datos tiene que ser la de la aplicación web de Apps Script (termina en /exec).'); return; }
-  document.getElementById('main').innerHTML='<p class="note">Cargando datos…</p>';
+
+  // Datos guardados de la última visita: el tablero abre al instante y después busca los nuevos.
+  let guardado=null;
+  try{ const g=JSON.parse(ls.get('zuppa-datos')||'null'); if(g&&g.k===k&&g.d) guardado=g.d; }catch(e){}
+  const arrancar=()=>{ const correr=()=>{ const app=document.createElement('script'); app.textContent=document.getElementById('app').textContent; document.body.appendChild(app); }; if(document.getElementById('app')) correr(); else document.addEventListener('DOMContentLoaded', correr); };
+  const nota=t=>{ const st=document.getElementById('stamp'); if(!st) return; let n=document.getElementById('nota-datos'); if(!n){ n=document.createElement('div'); n.id='nota-datos'; st.appendChild(n); } n.textContent=t; if(!t) n.remove(); };
+  if(guardado){ window.DATA=JSON.parse(guardado); arrancar(); nota('Buscando datos nuevos…'); }
+  else document.getElementById('main').innerHTML='<p class="note">Cargando datos… La primera vez puede tardar unos segundos.</p>';
+
+  window.DATA=guardado? window.DATA : undefined;
+  const previo=window.DATA;
   const s=document.createElement('script');
   s.src=api+(api.indexOf('?')<0?'?':'&')+'k='+encodeURIComponent(k)+'&t='+Date.now();
   s.onload=function(){
-    if(window.DATA_ERROR){ if(/llave/.test(window.DATA_ERROR)){ try{localStorage.removeItem('zuppa-llave')}catch(e){} } avisoError('No se pudieron cargar los datos', window.DATA_ERROR); return; }
-    if(!window.DATA){ avisoError('No se pudieron cargar los datos','El servicio respondió sin datos. Revisá que la aplicación web esté implementada con acceso "Cualquier persona".'); return; }
-    const app=document.createElement('script'); app.textContent=document.getElementById('app').textContent; document.body.appendChild(app);
+    if(window.DATA_ERROR){
+      if(/llave/.test(window.DATA_ERROR)){ ls.del('zuppa-llave'); ls.del('zuppa-datos'); window.__avisoMostrado=false; }
+      if(guardado && !/llave/.test(window.DATA_ERROR)){ nota('No se pudieron traer datos nuevos: se muestran los de la última visita.'); return; }
+      avisoError('No se pudieron cargar los datos', window.DATA_ERROR); return;
+    }
+    if(!window.DATA || window.DATA===previo){
+      if(guardado){ nota('No se pudieron traer datos nuevos: se muestran los de la última visita.'); return; }
+      avisoError('No se pudieron cargar los datos','El servicio respondió sin datos. Revisá que la aplicación web esté implementada con acceso "Cualquier persona".'); return;
+    }
+    const nuevo=JSON.stringify(window.DATA);
+    ls.set('zuppa-datos', JSON.stringify({k:k, d:nuevo}));
+    if(!guardado){ arrancar(); return; }
+    if(nuevo!==guardado){ window.DATA=previo; nota('Hay datos nuevos: actualizando…'); location.reload(); return; }
+    window.DATA=previo; nota('');
   };
-  s.onerror=function(){ avisoError('No se pudo conectar con el servicio de datos','Revisá que la aplicación web de Apps Script esté implementada como "Cualquier persona" y que el link sea el actual.'); };
+  s.onerror=function(){
+    if(guardado){ nota('Sin conexión con el servicio: se muestran los datos de la última visita.'); return; }
+    avisoError('No se pudo conectar con el servicio de datos','Revisá que la aplicación web de Apps Script esté implementada como "Cualquier persona" y que el link sea el actual.');
+  };
   document.head.appendChild(s);
 })();
 </script>
@@ -242,7 +276,7 @@ const chip = (x,good=true,d=1,suffix='') => { if(!isFinite(x)) return '<span cla
 const esc = s => String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
 /* ---------- estado y filtros ---------- */
-const st = {un:-1, ca:-1, de:-1, d1:DIAS[0], d2:CORTE, view:'resumen'};
+const st = {un:-1, ca:-1, de:-1, d1:DIAS[0], d2:CORTE, view:'ejecutivo'};
 function opt(sel, items, all){ sel.innerHTML = (all?`<option value="-1">${all}</option>`:'') + items.map(([v,t])=>`<option value="${v}">${esc(t)}</option>`).join(''); }
 opt(fUn, UN.map((u,i)=>[i,u]), 'Todas');
 opt(fCa, CA.map((c,i)=>[i,c]), 'Todos');
@@ -348,8 +382,97 @@ const rentCols = (first) => [{t:first,l:1},{t:'$ Neto',f:v=>MM(v)},{t:'HL',f:v=>
 const rentFoot = (r,lbl='Total') => [lbl,r.ne,r.hl,r.ph,r.pmb,r.ts,r.pmts];
 function monthAgg(rows){ const m=grp(rows,r=>r[0]*100+r[1],[4,5,6]); return k=>m.get(k)||[0,0,0]; }
 
+/* ---------- lectura del analista (texto escrito a mano: se actualiza junto con esta fecha) ---------- */
+const LECTURA_FECHA = '05/11/2026';
+const LECTURA = `     <li><span class="sev warn"></span><p><b>Cerveza va adelantada, pero por la carga del inicio de mes.</b> Lleva 1.481 HL, 21% del objetivo de 7.000 con 17% del mes transcurrido. El 85% entró el 2 y el 3 de noviembre, sobre todo en Mayorista; el 4 y el 5 vendió 85 y 137 HL, lejos de los 290 HL por día hábil que necesita de acá al cierre.</p></li>
+     <li><span class="sev good"></span><p><b>El precio de Cerveza mejora día a día.</b> Pasó de $262 mil/HL el 2/11 a $328 mil el 5/11, el primer día del mes sobre el mínimo de $320 mil. El promedio del mes sigue en $286 mil (−10,5%), arrastrado por Mayorista a $277 mil: la brecha acumulada es de $50 M.</p></li>
+     <li><span class="sev bad"></span><p><b>UNG necesita casi el doble de ritmo.</b> Lleva 518 HL, 10,5% del objetivo de 4.950. Vende 130 HL por día hábil y necesita 233. El precio sí se recuperó: promedia $141 mil/HL, 7% sobre el mínimo, aunque Mayorista y Autoservicios siguen debajo ($121 y $120 mil).</p></li>
+     <li><span class="sev warn"></span><p><b>El margen + TS sube a 9,7%, todavía debajo del 11,8% de octubre.</b> Sin trade spend el margen bruto es −3,4%. Corona lata 473 es el único producto con pérdida relevante aun con TS (−$1,4 M).</p></li>
+     <li><span class="sev info"></span><p><b>Proyección preliminar contra noviembre de 2025: −7% en volumen.</b> Con 4 de 23 días hábiles, el promedio diario lleva el mes a unos 11.800 HL contra 12.738. Hay que leerlo con cuidado: incluye la carga de los primeros días.</p></li>`;
+
 /* ---------- vistas ---------- */
 const V = {};
+const REF_MG_TS = 0.12;   // referencia para el semáforo de margen + TS (ajustable)
+
+V.ejecutivo = () => {
+  const temprano = HAB_TRANS < 5, mes = {un:-1, d1:DIAS[0], d2:CORTE};
+  const d = fD(mes), r = rentab(fP(mes)), p0 = pace(0), p1 = pace(1);
+  const g = monthAgg(fM({un:-1})), fac = HAB.length / HAB_TRANS, oc = g(YR*100+MC), ol = g(YA*100+MC);
+  const vy = ol[0] ? oc[0]*fac/ol[0]-1 : NaN;
+  const precio = u => { const rows = d.filter(x => x[3]===u), h = sum(rows,6); return h ? sum(rows,7)/h : NaN; };
+  const pc = precio(0), pu = precio(1), mc = X.minimos.cer*1000, mu = X.minimos.ung*1000;
+  const hlU = u => sum(d.filter(x => x[3]===u), 6);
+
+  // semáforos
+  const sVol = p => temprano ? ['mut','Preliminar'] : p.alcProy>=1 ? ['good','En camino'] : p.alcProy>=.9 ? ['warn','En riesgo'] : ['bad','Debajo del objetivo'];
+  const sPre = x => x>=1 ? ['good','Sobre el mínimo'] : x>=.95 ? ['warn','Cerca del mínimo'] : ['bad','Debajo del mínimo'];
+  const sMg = x => x>=REF_MG_TS ? ['good','En referencia'] : x>=REF_MG_TS-.02 ? ['warn','Algo debajo'] : ['bad','Debajo de referencia'];
+  const sYoy = x => temprano ? ['mut','Preliminar'] : x>=0 ? ['good','Crece'] : x>=-.05 ? ['warn','Cae levemente'] : ['bad','Cae'];
+  const card = (lab, val, est, sub1, sub2) => `<div class="card kpi exe"><div class="top"><div class="lab">${lab}</div><span class="chip ${est[0]}">${est[1]}</span></div><div class="val">${val}</div><div class="sub">${sub1}</div>${sub2?`<div class="sub">${sub2}</div>`:''}</div>`;
+  const tarjetas = [
+    card('Cerveza · volumen', PCT(p0.alc,0), sVol(p0), `<b>${N(p0.real)}</b> de ${N(p0.obj)} HL · mes transcurrido ${PCT(p0.tiempo,0)}`, `Cierre proyectado ${N(p0.proy)} HL (${PCT(p0.alcProy,0)})`),
+    card('UNG · volumen', PCT(p1.alc,0), sVol(p1), `<b>${N(p1.real)}</b> de ${N(p1.obj)} HL · mes transcurrido ${PCT(p1.tiempo,0)}`, `Cierre proyectado ${N(p1.proy)} HL (${PCT(p1.alcProy,0)})`),
+    card('Cerveza · precio final', `${N(pc/1000)}<small>mil/HL</small>`, sPre(pc/mc), `Mínimo $${N(X.minimos.cer)} mil · ${SPCT(pc/mc-1,1)}`, isFinite(pc)&&pc<mc ? `Brecha del mes: <b>${MM((mc-pc)*hlU(0),1)}</b>` : ''),
+    card('UNG · precio final', `${N(pu/1000)}<small>mil/HL</small>`, sPre(pu/mu), `Mínimo $${N(X.minimos.ung)} mil · ${SPCT(pu/mu-1,1)}`, isFinite(pu)&&pu<mu ? `Brecha del mes: <b>${MM((mu-pu)*hlU(1),1)}</b>` : ''),
+    card('Margen + trade spend', PCT(r.pmts,1), sMg(r.pmts), `Resultado <b>${MM(r.mts,1)}</b> · referencia ${PCT(REF_MG_TS,0)}`, `Sin TS el margen bruto es ${PCT(r.pmb,1)}`),
+    card(`Volumen vs ${MES[MC-1]} ${YA}`, SPCT(vy,0), sYoy(vy), `Proyección ${N(oc[0]*fac)} HL contra ${N(ol[0])} HL`, 'Todas las unidades de negocio'),
+  ];
+
+  // titular automático
+  const rojos = [sVol(p0),sVol(p1),sPre(pc/mc),sPre(pu/mu),sMg(r.pmts),sYoy(vy)].filter(e => e[0]==='bad').length;
+  const titular = `Al <b>${X.corte}</b>, con ${PCT(p0.tiempo,0)} del mes transcurrido, Cerveza lleva <b>${PCT(p0.alc,0)}</b> del objetivo y UNG <b>${PCT(p1.alc,0)}</b>. ` +
+    (rojos ? `<b>${rojos} de 6 indicadores</b> están en rojo.` : 'Ningún indicador está en rojo.') +
+    (temprano ? ' Con tan pocos días, las proyecciones todavía son preliminares.' : '');
+
+  // alertas automáticas
+  const al = [];
+  if (isFinite(pc) && pc < mc) al.push({sev:pc/mc<.95?'bad':'warn', w:(mc-pc)*hlU(0), t:`<b>Cerveza se factura ${PCT(1-pc/mc,1)} debajo del mínimo.</b> Promedio de $${N(pc/1000)} mil/HL contra $${N(X.minimos.cer)} mil: la brecha acumulada es de ${MM((mc-pc)*hlU(0),1)}.`});
+  if (isFinite(pu) && pu < mu) al.push({sev:pu/mu<.95?'bad':'warn', w:(mu-pu)*hlU(1), t:`<b>UNG se factura ${PCT(1-pu/mu,1)} debajo del mínimo.</b> Promedio de $${N(pu/1000)} mil/HL contra $${N(X.minimos.ung)} mil: la brecha acumulada es de ${MM((mu-pu)*hlU(1),1)}.`});
+  const ult = d.filter(x => x[0]===CORTE), cortes = grp(ult.filter(x => x[3]<=1), x => x[3]*10+x[2], [6,7]);
+  [...cortes].map(([k,a]) => ({u:Math.floor(k/10), c:k%10, hl:a[0], ph:a[1]/a[0]})).filter(o => o.hl>=20 && o.ph < 0.99*(o.u===0?mc:mu))
+    .sort((a,b) => (a.ph/(a.u===0?mc:mu)) - (b.ph/(b.u===0?mc:mu))).slice(0,2)
+    .forEach(o => al.push({sev:'warn', w:0, t:`<b>El ${diaLbl(CORTE)}, ${o.u===0?'Cerveza':'UNG'} en ${CANAL_NOMBRE[CA[o.c]]} salió a $${N(o.ph/1000)} mil/HL.</b> Fueron ${N(o.hl)} HL, ${PCT(1-o.ph/(o.u===0?mc:mu),0)} debajo del mínimo.`}));
+  if (!temprano) [[p0,'Cerveza'],[p1,'UNG']].forEach(([p,n]) => { if (p.req > p.prom*1.2) al.push({sev:'bad', w:0, t:`<b>${n} necesita ${N(p.req)} HL por día hábil para cumplir.</b> Es ${N(p.req/p.prom,1)} veces su promedio del mes (${N(p.prom)} HL).`}); });
+  const prodRes = [...grp(fP(mes), x => x[2], [7,8,9])].map(([k,a]) => [X.prods[k], a[1]+a[2]-a[0]]).filter(x => x[1] < 0).sort((a,b) => a[1]-b[1]);
+  const pNeg = prodRes.reduce((s,x) => s+x[1], 0);
+  if (pNeg < -1e6) al.push({sev:'warn', w:-pNeg, t:`<b>${prodRes.length} productos pierden plata aun con trade spend: ${MM(pNeg,1)}.</b> El que más pierde es ${esc(prodRes[0][0])} (${MM(prodRes[0][1],1)}).`});
+  const cliRes = [...grp(fP(mes), x => x[1], [7,8,9])].map(([k,a]) => a[1]+a[2]-a[0]).filter(v => v < 0);
+  const cNeg = cliRes.reduce((s,v) => s+v, 0);
+  if (cliRes.length) al.push({sev:'info', w:0, t:`<b>${N(cliRes.length)} clientes con resultado negativo aun con trade spend.</b> Suman ${MM(cNeg,1)}${-cNeg < Math.abs(pNeg) ? ': el problema de margen está más en productos que en clientes.' : '.'}`});
+  if (r.pmb < 0) al.push({sev:'info', w:0, t:`<b>El trade spend sostiene el resultado.</b> Sin él, el margen bruto es ${PCT(r.pmb,1)}; el TS equivale al ${PCT(r.ts/r.ne,1)} de la venta neta.`});
+  const orden = {bad:0, warn:1, info:2};
+  const alertas = al.sort((a,b) => orden[a.sev]-orden[b.sev] || b.w-a.w).slice(0,6);
+
+  setTimeout(() => { const o = baseOpts(); [0,1].forEach(u => {
+    const p = u===0?p0:p1, col = css(u===0?'--cer':'--ung');
+    const rows = X.D.filter(x => x[3]===u && (st.ca<0||x[2]===st.ca) && (st.de<0||x[4]===st.de));
+    const porDia = grp(rows, x => x[0], [6]);
+    let acum = 0; const real = [], ult = HAB.filter(h => h<=CORTE).length-1;
+    HAB.forEach(h => { for (const [dd,a] of porDia) if (dd<=h && dd>(HAB[HAB.indexOf(h)-1]||0)) acum += a[0]; real.push(h<=CORTE ? acum : null); });
+    const proy = HAB.map((h,i) => (temprano || i<ult) ? null : real[ult] + p.prom*(i-ult));
+    const obj = HAB.map((h,i) => p.obj*(i+1)/HAB.length);
+    mk('cEx'+u, {type:'line', data:{labels:HAB.map(h => h+'/'+MC), datasets:[
+      {label:'Real acumulado', data:real, borderColor:col, backgroundColor:col, borderWidth:2.5, pointRadius:real.map((v,i) => i===ult?5:0), spanGaps:false},
+      {label:'Proyección', data:proy, borderColor:col, borderDash:[2,4], borderWidth:2, pointRadius:0},
+      {label:'Ritmo para cumplir', data:obj, borderColor:css('--muted'), borderDash:[6,4], borderWidth:1.5, pointRadius:0}]},
+      options:{...o, scales:{...o.scales, x:{...o.scales.x, ticks:{color:css('--muted'), maxRotation:0, autoSkip:true, maxTicksLimit:8}}, y:{...o.scales.y, beginAtZero:true, title:{display:true, text:'HL acumulados'}}},
+        plugins:{...o.plugins, tooltip:{...o.plugins.tooltip, filter:c => c.raw!=null, callbacks:{label:c => `${c.dataset.label}: ${N(c.raw)} HL`}}}}});
+  }); });
+
+  const leyenda = col => `<div class="legend"><span><i class="ln" style="background:${col}"></i>Real acumulado</span>${temprano?'':`<span><i class="dash" style="border-color:${col}"></i>Proyección al ritmo actual</span>`}<span><i class="dash" style="border-color:var(--muted)"></i>Ritmo para cumplir el objetivo</span></div>`;
+  return `<div class="vh"><div><h1>Panorama ejecutivo · ${mcn} ${YR}</h1><p class="titular">${titular}</p></div></div>
+  <div class="grid k3">${tarjetas.join('')}</div>
+  <div class="grid g2">
+   <div class="card"><h2>Cerveza · ritmo del mes <small>objetivo ${N(p0.obj)} HL</small></h2>${leyenda('var(--cer)')}<div class="chart short"><canvas id="cEx0" role="img" aria-label="Cerveza: HL acumulados contra el ritmo para cumplir el objetivo"></canvas></div></div>
+   <div class="card"><h2>UNG · ritmo del mes <small>objetivo ${N(p1.obj)} HL</small></h2>${leyenda('var(--ung)')}<div class="chart short"><canvas id="cEx1" role="img" aria-label="UNG: HL acumulados contra el ritmo para cumplir el objetivo"></canvas></div></div>
+  </div>
+  <div class="grid g2">
+   <div class="card"><h2>Alertas del día <small>se calculan solas con cada actualización</small></h2><ul class="ins">${alertas.length ? alertas.map(a => `<li><span class="sev ${a.sev}"></span><p>${a.t}</p></li>`).join('') : '<li><span class="sev good"></span><p>Sin alertas: precio, ritmo y margen dentro de lo esperado.</p></li>'}</ul></div>
+   <div class="card"><h2>Lectura del analista <small>escrita a mano al ${LECTURA_FECHA}</small></h2><ul class="ins">${LECTURA}</ul></div>
+  </div>
+  ${(st.un>=0) ? '<p class="note">La vista ejecutiva muestra siempre las dos unidades: el filtro de unidad de negocio no se aplica acá.</p>' : ''}
+  <p class="note">Semáforos: volumen según el cierre proyectado contra el objetivo (verde ≥ 100%, amarillo ≥ 90%); precio contra el mínimo (amarillo hasta 5% debajo); margen + TS contra una referencia de ${PCT(REF_MG_TS,0)}; volumen contra el mismo mes de ${YA} proyectado a fin de mes.</p>`;
+};
 
 V.resumen = () => {
   const d=fD(), p=fP(), hl=sum(d,6), fin=sum(d,7), r=rentab(p), ccc=uniq(d,1);
@@ -373,12 +496,9 @@ V.resumen = () => {
      <tr><td>Enero a ${MESL[CER-1].toLowerCase()}</td><td>${N(y6[0])}</td><td>${N(y5[0])}</td><td>${chip(y6[0]/y5[0]-1)}</td><td>${PH(y6[1]/y6[0])}</td><td>${chip((y6[1]/y6[0])/(y5[1]/y5[0])-1)}</td></tr>
     </tbody></table></div>
     <p class="note">La proyección extiende el promedio de HL por día hábil a los ${HAB.length} días hábiles de ${mcn} (lunes a sábado, ${feriadosTxt}). La variación de $/HL es nominal: para leer precio real conviene deflactar por IPC.</p></div>
-   <div class="card"><h2>Lectura del analista <small>con todos los datos, sin filtros</small></h2>
+   <div class="card"><h2>Lectura del analista <small>escrita a mano al ${LECTURA_FECHA} · con todos los datos</small></h2>
     <ul class="ins">
-     <li><span class="sev warn"></span><p><b>Cerveza arranca noviembre con carga mayorista.</b> En dos días vendió 1.261 HL, 18% del objetivo de 7.000. El 84% fue al canal Mayorista, a $277 mil/HL final, debajo del mínimo de $320 mil. Es la carga típica de inicio de mes: la proyección lineal todavía no es representativa.</p></li>
-     <li><span class="sev bad"></span><p><b>UNG arranca lento y bajo precio.</b> Lleva 173 HL, 3,5% del objetivo de 4.950. Necesita 227 HL por día hábil, contra 131 de promedio en octubre. Se facturó entre $123 y $129 mil/HL, debajo del mínimo de $132 mil.</p></li>
-     <li><span class="sev warn"></span><p><b>El margen + TS arranca en 8,8%, debajo del 11,8% de octubre.</b> Lo explica el mix mayorista. Santos Hilda (153 HL, 2,7%) y Carletto Exequiel (144 HL, 5,3%) concentran 21% del volumen del mes.</p></li>
-     <li><span class="sev info"></span><p><b>Los objetivos de noviembre piden recuperar volumen.</b> Cerveza 7.000 HL (+18% sobre el cierre de octubre) y UNG 4.950 HL (+32%). Juntos quedan 6% debajo de lo vendido en noviembre de 2025.</p></li>
+${LECTURA}
     </ul></div>
   </div>
   ${full?'':'<p class="note">Hay un filtro de días activo: los KPIs del mes reflejan solo esos días.</p>'}`;
@@ -621,11 +741,11 @@ function render(){
   document.querySelectorAll('#tabs a').forEach(a=>a.setAttribute('aria-current', a.getAttribute('href')==='#'+st.view?'page':'false'));
   const mainEl=document.getElementById('main'); mainEl.innerHTML = `<section class="view">${V[st.view]()}</section>`;
 }
-function fromHash(){ const h=location.hash.slice(1); st.view = V[h]? h : 'resumen'; try{localStorage.setItem('zuppa-view',st.view)}catch(e){} render(); }
+function fromHash(){ const h=location.hash.slice(1); st.view = V[h]? h : 'ejecutivo'; try{localStorage.setItem('zuppa-view',st.view)}catch(e){} render(); }
 document.querySelectorAll('#tabs a').forEach(a=>a.addEventListener('click',e=>{ e.preventDefault(); const v=a.getAttribute('href').slice(1); history.replaceState(null,'','#'+v); st.view=v; try{localStorage.setItem('zuppa-view',v)}catch(_){} render(); window.scrollTo(0,0); }));
 window.addEventListener('hashchange',fromHash);
 if(!location.hash){ try{ const v=localStorage.getItem('zuppa-view'); if(v&&V[v]) st.view=v; }catch(e){} }
-else st.view = V[location.hash.slice(1)]? location.hash.slice(1) : 'resumen';
+else st.view = V[location.hash.slice(1)]? location.hash.slice(1) : 'ejecutivo';
 render();
 </script>
 
