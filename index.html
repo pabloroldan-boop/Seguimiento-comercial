@@ -129,6 +129,12 @@ td .bar-in{display:inline-block;height:6px;border-radius:3px;background:var(--na
 .exe .val{font-size:36px}
 .exe .sub b{color:var(--ink)}
 .k3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.k4{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media (max-width:1180px){.k4{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.k4{grid-template-columns:minmax(0,1fr)}}
+.cobsel{display:flex;gap:10px;align-items:end;flex-wrap:wrap;margin-bottom:8px}
+.cobsel label{display:flex;flex-direction:column;gap:2px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600}
+.cobsel select{font:inherit;font-size:13px;text-transform:none;letter-spacing:0;color:var(--ink);background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:5px 8px}
 @media (max-width:980px){.k3{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:560px){.k3{grid-template-columns:minmax(0,1fr)}}
 .titular{font-size:16px;color:var(--text);max-width:85ch;margin:6px 0 0;line-height:1.5}
@@ -158,8 +164,9 @@ td .bar-in{display:inline-block;height:6px;border-radius:3px;background:var(--na
   <text x="60" y="79" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="8.2" letter-spacing="2.6" fill="#9a9a9a">distribuidora</text>
 </svg><span>Seguimiento<br>comercial</span></div>
       <nav class="tabs" id="tabs" aria-label="Vistas">
-        <a href="#ejecutivo">Ejecutivo<span class="new">nuevo</span></a>
+        <a href="#ejecutivo">Ejecutivo</a>
         <a href="#resumen">Resumen</a>
+        <a href="#cobertura">Clientes y cobertura<span class="new">nuevo</span></a>
         <a href="#diario">Diario</a>
         <a href="#acumulado">Acumulado</a>
         <a href="#preciodiario">$/HL diario</a>
@@ -383,16 +390,28 @@ const rentFoot = (r,lbl='Total') => [lbl,r.ne,r.hl,r.ph,r.pmb,r.ts,r.pmts];
 function monthAgg(rows){ const m=grp(rows,r=>r[0]*100+r[1],[4,5,6]); return k=>m.get(k)||[0,0,0]; }
 
 /* ---------- lectura del analista (texto escrito a mano: se actualiza junto con esta fecha) ---------- */
-const LECTURA_FECHA = '05/11/2026';
-const LECTURA = `     <li><span class="sev warn"></span><p><b>Cerveza va adelantada, pero por la carga del inicio de mes.</b> Lleva 1.481 HL, 21% del objetivo de 7.000 con 17% del mes transcurrido. El 85% entró el 2 y el 3 de noviembre, sobre todo en Mayorista; el 4 y el 5 vendió 85 y 137 HL, lejos de los 290 HL por día hábil que necesita de acá al cierre.</p></li>
-     <li><span class="sev good"></span><p><b>El precio de Cerveza mejora día a día.</b> Pasó de $262 mil/HL el 2/11 a $328 mil el 5/11, el primer día del mes sobre el mínimo de $320 mil. El promedio del mes sigue en $286 mil (−10,5%), arrastrado por Mayorista a $277 mil: la brecha acumulada es de $50 M.</p></li>
-     <li><span class="sev bad"></span><p><b>UNG necesita casi el doble de ritmo.</b> Lleva 518 HL, 10,5% del objetivo de 4.950. Vende 130 HL por día hábil y necesita 233. El precio sí se recuperó: promedia $141 mil/HL, 7% sobre el mínimo, aunque Mayorista y Autoservicios siguen debajo ($121 y $120 mil).</p></li>
-     <li><span class="sev warn"></span><p><b>El margen + TS sube a 9,7%, todavía debajo del 11,8% de octubre.</b> Sin trade spend el margen bruto es −3,4%. Corona lata 473 es el único producto con pérdida relevante aun con TS (−$1,4 M).</p></li>
-     <li><span class="sev info"></span><p><b>Proyección preliminar contra noviembre de 2025: −7% en volumen.</b> Con 4 de 23 días hábiles, el promedio diario lleva el mes a unos 11.800 HL contra 12.738. Hay que leerlo con cuidado: incluye la carga de los primeros días.</p></li>`;
+const LECTURA_FECHA = '11/11/2026';
+const LECTURA = `     <li><span class="sev bad"></span><p><b>Cerveza se frenó después de la carga del inicio de mes.</b> Lleva 2.232 HL, 32% del objetivo con 35% del mes transcurrido. Desde el 4/11 promedia 162 HL por día hábil y necesita 318: a ese ritmo cerraría cerca de 4.700 HL, dos tercios del objetivo. La proyección del tablero (92%) todavía incluye la carga del 2 y 3 de noviembre.</p></li>
+     <li><span class="sev warn"></span><p><b>UNG recuperó ritmo, pero resignando precio.</b> Lleva 1.760 HL (36% del objetivo) y desde el 4/11 vende 265 HL por día hábil, más que los 213 que necesita. El precio cayó a $125 mil/HL en el mes (−5% contra el mínimo) y a $103 mil el 11/11; Mayorista sale a $114 mil y K+T bajó a $125 mil.</p></li>
+     <li><span class="sev bad"></span><p><b>Cerveza sigue debajo del mínimo 7 de 8 días.</b> Promedia $288 mil/HL contra $320 mil, con una brecha de $72 M. Mayorista concentra 55% del volumen de Cerveza a $275 mil; K+T está en $312 mil.</p></li>
+     <li><span class="sev warn"></span><p><b>El margen bruto empeora a −8,8% sin trade spend.</b> Con TS queda en 9,5%. Mayorista es el canal más flojo (7,5% con TS). Aparece Andes Blanca lata 710 con −$3,4 M aun con TS, que se suma a Corona lata 473 (−$1,5 M).</p></li>
+     <li><span class="sev info"></span><p><b>Compraron 1.438 clientes, 53% de la cartera activa.</b> Con 35% del mes transcurrido ya son el 68% de los clientes de octubre. Quedan 1.271 sin compra; Quiroga, Córdoba y Bilyk tienen más de 100 pendientes cada uno.</p></li>`;
 
 /* ---------- vistas ---------- */
 const V = {};
 const REF_MG_TS = 0.12;   // referencia para el semáforo de margen + TS (ajustable)
+
+/* ---------- cobertura de cartera ---------- */
+const COB = X.cob || null;
+function cobDatos(){
+  if (!COB) return null;
+  const canal = st.ca>=0 ? CA[st.ca] : null, dep = st.de>=0 ? X.deps[st.de] : null;
+  const filas = COB.filas.filter(f => (!canal || f[1]===canal) && (!dep || f[2]===dep));
+  const base = filas.length, comp = filas.filter(f => f[5]).length;
+  const prevFull = X.CCC[COB.ant[0]+'-'+COB.ant[1]], lyFull = X.CCC[YA+'-'+MC];
+  return {filas, base, comp, sin: base-comp, cob: base? comp/base : NaN, filtrado: !!(canal||dep), prevFull, lyFull,
+          antNom: MESL[COB.ant[1]-1].toLowerCase()+(COB.ant[0]!==YR?' '+COB.ant[0]:'')};
+}
 
 V.ejecutivo = () => {
   const temprano = HAB_TRANS < 5, mes = {un:-1, d1:DIAS[0], d2:CORTE};
@@ -417,6 +436,13 @@ V.ejecutivo = () => {
     card('Margen + trade spend', PCT(r.pmts,1), sMg(r.pmts), `Resultado <b>${MM(r.mts,1)}</b> · referencia ${PCT(REF_MG_TS,0)}`, `Sin TS el margen bruto es ${PCT(r.pmb,1)}`),
     card(`Volumen vs ${MES[MC-1]} ${YA}`, SPCT(vy,0), sYoy(vy), `Proyección ${N(oc[0]*fac)} HL contra ${N(ol[0])} HL`, 'Todas las unidades de negocio'),
   ];
+  const cb = cobDatos();
+  if (cb) {
+    const sCli = COB.prevDia!=null && !cb.filtrado ? (x => x>=1?['good','Más que el mes anterior']:x>=.95?['warn','Parecido al mes anterior']:['bad','Menos que el mes anterior'])(cb.comp/COB.prevDia) : ['mut','Sin dato al mismo día'];
+    tarjetas.push(
+      card('Clientes con compra', N(cb.comp), sCli, `${cb.antNom} completo: <b>${N(cb.prevFull)}</b> · ${PCT(cb.comp/cb.prevFull,0)} alcanzado`, `${MES[MC-1]} ${YA} completo: ${N(cb.lyFull)} · mes transcurrido ${PCT(HAB_TRANS/HAB.length,0)}`),
+      card('Cobertura de cartera', PCT(cb.cob,0), ['mut','Informativo'], `<b>${N(cb.sin)}</b> clientes activos sin compra`, `Cartera activa ${N(cb.base)} clientes`));
+  }
 
   // titular automático
   const rojos = [sVol(p0),sVol(p1),sPre(pc/mc),sPre(pu/mu),sMg(r.pmts),sYoy(vy)].filter(e => e[0]==='bad').length;
@@ -439,6 +465,10 @@ V.ejecutivo = () => {
   const cliRes = [...grp(fP(mes), x => x[1], [7,8,9])].map(([k,a]) => a[1]+a[2]-a[0]).filter(v => v < 0);
   const cNeg = cliRes.reduce((s,v) => s+v, 0);
   if (cliRes.length) al.push({sev:'info', w:0, t:`<b>${N(cliRes.length)} clientes con resultado negativo aun con trade spend.</b> Suman ${MM(cNeg,1)}${-cNeg < Math.abs(pNeg) ? ': el problema de margen está más en productos que en clientes.' : '.'}`});
+  if (cb && cb.sin) {
+    const pv = [...grp(cb.filas.filter(f => !f[5] && f[3]!=='Sin dato').map(f => [f[3]]), f => f[0], [])].map(([k,a]) => [k, a.n]).sort((a,b) => b[1]-a[1]).slice(0,3);
+    al.push({sev: HAB_TRANS>=HAB.length/2 ? 'warn' : 'info', w:0, t:`<b>${N(cb.sin)} clientes activos todavía no compraron este mes.</b>${pv.length ? ` Los vendedores con más pendientes: ${pv.map(([k,n]) => `${esc(k)} (${N(n)})`).join(', ')}.` : ''}`});
+  }
   if (r.pmb < 0) al.push({sev:'info', w:0, t:`<b>El trade spend sostiene el resultado.</b> Sin él, el margen bruto es ${PCT(r.pmb,1)}; el TS equivale al ${PCT(r.ts/r.ne,1)} de la venta neta.`});
   const orden = {bad:0, warn:1, info:2};
   const alertas = al.sort((a,b) => orden[a.sev]-orden[b.sev] || b.w-a.w).slice(0,6);
@@ -461,7 +491,7 @@ V.ejecutivo = () => {
 
   const leyenda = col => `<div class="legend"><span><i class="ln" style="background:${col}"></i>Real acumulado</span>${temprano?'':`<span><i class="dash" style="border-color:${col}"></i>Proyección al ritmo actual</span>`}<span><i class="dash" style="border-color:var(--muted)"></i>Ritmo para cumplir el objetivo</span></div>`;
   return `<div class="vh"><div><h1>Panorama ejecutivo · ${mcn} ${YR}</h1><p class="titular">${titular}</p></div></div>
-  <div class="grid k3">${tarjetas.join('')}</div>
+  <div class="grid ${tarjetas.length>6?'k4':'k3'}">${tarjetas.join('')}</div>
   <div class="grid g2">
    <div class="card"><h2>Cerveza · ritmo del mes <small>objetivo ${N(p0.obj)} HL</small></h2>${leyenda('var(--cer)')}<div class="chart short"><canvas id="cEx0" role="img" aria-label="Cerveza: HL acumulados contra el ritmo para cumplir el objetivo"></canvas></div></div>
    <div class="card"><h2>UNG · ritmo del mes <small>objetivo ${N(p1.obj)} HL</small></h2>${leyenda('var(--ung)')}<div class="chart short"><canvas id="cEx1" role="img" aria-label="UNG: HL acumulados contra el ritmo para cumplir el objetivo"></canvas></div></div>
@@ -472,6 +502,64 @@ V.ejecutivo = () => {
   </div>
   ${(st.un>=0) ? '<p class="note">La vista ejecutiva muestra siempre las dos unidades: el filtro de unidad de negocio no se aplica acá.</p>' : ''}
   <p class="note">Semáforos: volumen según el cierre proyectado contra el objetivo (verde ≥ 100%, amarillo ≥ 90%); precio contra el mínimo (amarillo hasta 5% debajo); margen + TS contra una referencia de ${PCT(REF_MG_TS,0)}; volumen contra el mismo mes de ${YA} proyectado a fin de mes.</p>`;
+};
+
+V.cobertura = () => {
+  const cb = cobDatos();
+  if (!cb) return `<div class="vh"><div><h1>Clientes y cobertura</h1><p>Esta vista necesita las pestañas "Clientes activos" (la lista de clientes) y "Compras por cliente" en el Excel.</p></div></div>`;
+  const ven = [...new Set(cb.filas.filter(f => !f[5]).map(f => f[3]))].sort((a,b) => a.localeCompare(b));
+  if (st.cobVen && !ven.includes(st.cobVen)) st.cobVen = '';
+  const cuenta = (key) => { const m = new Map(); cb.filas.forEach(f => { const k = f[key]; const a = m.get(k) || [0,0]; a[0]++; a[1] += f[5]; m.set(k,a); }); return [...m].map(([k,a]) => [k, a[0], a[1], a[0]-a[1], a[1]/a[0]]); };
+  const cols = n => [{t:n,l:1},{t:'Cartera',f:v=>N(v)},{t:'Con compra',f:v=>N(v)},{t:'Sin compra',f:v=>N(v)},{t:'Cobertura',f:v=>PCT(v,0)}];
+  const pie = ['Total', cb.base, cb.comp, cb.sin, cb.cob];
+  const unOrden = UN.filter(u => COB.porUN[u]).map(u => [u, COB.porUN[u]]);
+  const listaVen = [...grp(cb.filas.filter(f => !f[5]).map(f => [f[3]]), f => f[0], [])].map(([k,a]) => [k, a.n, a.n/cb.sin]);
+  setTimeout(() => {
+    const o = baseOpts();
+    const datos = [['Cualquier unidad', cb.comp]].concat(st.ca<0 && st.de<0 ? unOrden : []);
+    mk('cCobUN', {type:'bar', data:{labels:datos.map(d => d[0]==='Cualquier unidad'?d[0]:UNS[UN.indexOf(d[0])]), datasets:[{data:datos.map(d => d[1]), backgroundColor:datos.map((d,i) => i===0?css('--navy'):unColor(UN.indexOf(d[0]))), borderRadius:3, maxBarThickness:24}]},
+      options:{...o, indexAxis:'y', interaction:{mode:'nearest',intersect:true}, layout:{padding:{right:110}}, scales:{x:{display:false, max:cb.base}, y:{grid:{display:false}, border:{display:false}, ticks:{color:css('--text')}}},
+        plugins:{...o.plugins, vl:{fmt:v => `${N(v)} · ${PCT(v/cb.base,0)}`}, tooltip:{...o.plugins.tooltip, callbacks:{label:c => `${N(c.raw)} clientes · ${PCT(c.raw/cb.base,1)} de la cartera`}}}}});
+    const ms = [...Array(MC)].map((_,i) => i+1);
+    mk('cCobMes', {type:'line', data:{labels:ms.map(m => MES[m-1]), datasets:[
+      {label:String(YR), data:ms.map(m => X.CCC[YR+'-'+m]??null), borderColor:css('--navy'), backgroundColor:css('--navy'), borderWidth:2, pointRadius:ms.map(m => m===MC?5:3)},
+      {label:String(YA), data:ms.map(m => X.CCC[YA+'-'+m]??null), borderColor:css('--c6'), backgroundColor:css('--c6'), borderWidth:2, borderDash:[2,3], pointRadius:3}]},
+      options:{...o, plugins:{...o.plugins, tooltip:{...o.plugins.tooltip, callbacks:{label:c => `${c.dataset.label}: ${N(c.raw)} clientes${c.dataIndex===MC-1&&c.datasetIndex===0?' (a la fecha)':''}`}}}}});
+    table(document.getElementById('tCobCanal'), cols('Canal'), cuenta(1).map(r => [CANAL_NOMBRE[r[0]]||r[0]].concat(r.slice(1))), {sort:1, foot:pie});
+    table(document.getElementById('tCobDep'), cols('Departamento'), cuenta(2), {sort:1, foot:pie});
+    table(document.getElementById('tCobVen'), [{t:'Vendedor',l:1},{t:'Sin compra',f:v=>N(v)},{t:'% de los pendientes',f:v=>PCT(v,0)}], listaVen, {sort:1, foot:['Total', cb.sin, 1]});
+    const pend = cb.filas.filter(f => !f[5] && (!st.cobVen || f[3]===st.cobVen)).map(f => [f[0], CANAL_NOMBRE[f[1]]||f[1], f[2], f[3], f[4] ? f[4].split('-').reverse().join('/') : '']);
+    table(document.getElementById('tCobPend'), [{t:'Cliente',l:1},{t:'Canal',l:1},{t:'Departamento',l:1},{t:'Vendedor',l:1},{t:'Alta',l:1}], pend, {sort:0, dir:1, search:'Buscar cliente'});
+    const sel = document.getElementById('cobVen'); if (sel) { sel.value = st.cobVen||''; sel.onchange = () => { st.cobVen = sel.value; render(); }; }
+  });
+  const vs = (full, dia, nom) => dia!=null && !cb.filtrado ? `<div class="val">${SPCT(cb.comp/dia-1,0)}</div><div class="sub">Al mismo día de ${nom}: ${N(dia)} clientes</div>`
+    : `<div class="val">${PCT(cb.comp/full,0)}</div><div class="sub">de los ${N(full)} clientes de ${nom} completo</div><div class="sub">Mes transcurrido ${PCT(HAB_TRANS/HAB.length,0)}</div>`;
+  const sinMismoDia = COB.prevDia==null || COB.lyDia==null;
+  const soloSinCompra = !cb.filas.some(f => f[5] && f[3]!=='Sin dato');
+  return `<div class="vh"><div><h1>Clientes y cobertura · ${mcn} ${YR}</h1><p>La cartera activa son los clientes dados de alta, compren o no. Un cliente con compra cuenta una vez aunque compre varias unidades de negocio: su volumen neto del mes tiene que ser positivo.</p></div></div>
+  <div class="grid k5">
+   <div class="card kpi"><div class="lab">Cartera activa</div><div class="val">${N(cb.base)}</div><div class="sub">clientes dados de alta${cb.filtrado?' · con los filtros aplicados':''}</div></div>
+   <div class="card kpi"><div class="lab">Con compra en ${mcn}</div><div class="val">${N(cb.comp)}</div><div class="sub">Cobertura <b style="color:var(--ink)">${PCT(cb.cob,1)}</b> de la cartera</div></div>
+   <div class="card kpi"><div class="lab">Sin compra todavía</div><div class="val">${N(cb.sin)}</div><div class="sub">${PCT(1-cb.cob,1)} de la cartera</div></div>
+   <div class="card kpi"><div class="lab">Contra ${cb.antNom}</div>${vs(cb.prevFull, COB.prevDia, cb.antNom)}</div>
+   <div class="card kpi"><div class="lab">Contra ${mcn} ${YA}</div>${vs(cb.lyFull, COB.lyDia, `${mcn} ${YA}`)}</div>
+  </div>
+  <div class="grid g2">
+   <div class="card"><h2>Clientes con compra por unidad de negocio <small>sobre la cartera activa · un cliente puede comprar varias</small></h2><div class="chart short"><canvas id="cCobUN" role="img" aria-label="Clientes con compra por unidad de negocio"></canvas></div>${st.ca>=0||st.de>=0?'<p class="note">Con filtro de canal o departamento se muestra solo el total.</p>':''}</div>
+   <div class="card"><h2>Clientes con compra por mes <small>${YR} contra ${YA} · el mes en curso va a la fecha</small></h2><div class="legend"><span><i class="ln" style="background:var(--navy)"></i>${YR}</span><span><i class="dash" style="border-color:var(--c6)"></i>${YA}</span></div><div class="chart short"><canvas id="cCobMes"></canvas></div></div>
+  </div>
+  <div class="grid g2">
+   <div class="card"><h2>Cobertura por canal</h2><div id="tCobCanal"></div></div>
+   <div class="card"><h2>Cobertura por departamento</h2><div id="tCobDep"></div></div>
+  </div>
+  <div class="grid g21">
+   <div class="card"><h2>Clientes activos sin compra en ${mcn} <small>la lista para salir a buscarlos</small></h2>
+    <div class="cobsel"><label for="cobVen">Vendedor<select id="cobVen"><option value="">Todos</option>${ven.map(v => `<option value="${esc(v)}">${esc(v)}</option>`).join('')}</select></label></div>
+    <div id="tCobPend"></div></div>
+   <div class="card"><h2>Pendientes por vendedor</h2><div id="tCobVen"></div>
+    ${soloSinCompra?'<p class="note">La pestaña Clientes activos trae solo a los clientes sin compra, así que no se puede calcular la cobertura de cada vendedor. Si trae toda la cartera, también la de los que compraron, se agrega.</p>':''}</div>
+  </div>
+  ${sinMismoDia?`<p class="note">Las comparaciones contra ${cb.antNom} y contra ${mcn} ${YA} son contra el mes completo, porque la pestaña Compras por cliente trae solo ${mcn}. Si suma las compras de esos meses, el tablero compara al mismo día.</p>`:''}`;
 };
 
 V.resumen = () => {
