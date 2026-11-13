@@ -186,7 +186,7 @@ td .bar-in{display:inline-block;height:6px;border-radius:3px;background:var(--na
   </div>
 </header>
 
-<main class="wrap" id="main"><p class="note">Cargando el tablero… (versión 3 · 04/11)</p></main>
+<main class="wrap" id="main"><p class="note">Cargando el tablero… (versión 3 · 13/11)</p></main>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script>
@@ -390,12 +390,12 @@ const rentFoot = (r,lbl='Total') => [lbl,r.ne,r.hl,r.ph,r.pmb,r.ts,r.pmts];
 function monthAgg(rows){ const m=grp(rows,r=>r[0]*100+r[1],[4,5,6]); return k=>m.get(k)||[0,0,0]; }
 
 /* ---------- lectura del analista (texto escrito a mano: se actualiza junto con esta fecha) ---------- */
-const LECTURA_FECHA = '11/11/2026';
-const LECTURA = `     <li><span class="sev bad"></span><p><b>Cerveza se frenó después de la carga del inicio de mes.</b> Lleva 2.232 HL, 32% del objetivo con 35% del mes transcurrido. Desde el 4/11 promedia 162 HL por día hábil y necesita 318: a ese ritmo cerraría cerca de 4.700 HL, dos tercios del objetivo. La proyección del tablero (92%) todavía incluye la carga del 2 y 3 de noviembre.</p></li>
-     <li><span class="sev warn"></span><p><b>UNG recuperó ritmo, pero resignando precio.</b> Lleva 1.760 HL (36% del objetivo) y desde el 4/11 vende 265 HL por día hábil, más que los 213 que necesita. El precio cayó a $125 mil/HL en el mes (−5% contra el mínimo) y a $103 mil el 11/11; Mayorista sale a $114 mil y K+T bajó a $125 mil.</p></li>
-     <li><span class="sev bad"></span><p><b>Cerveza sigue debajo del mínimo 7 de 8 días.</b> Promedia $288 mil/HL contra $320 mil, con una brecha de $72 M. Mayorista concentra 55% del volumen de Cerveza a $275 mil; K+T está en $312 mil.</p></li>
-     <li><span class="sev warn"></span><p><b>El margen bruto empeora a −8,8% sin trade spend.</b> Con TS queda en 9,5%. Mayorista es el canal más flojo (7,5% con TS). Aparece Andes Blanca lata 710 con −$3,4 M aun con TS, que se suma a Corona lata 473 (−$1,5 M).</p></li>
-     <li><span class="sev info"></span><p><b>Compraron 1.438 clientes, 53% de la cartera activa.</b> Con 35% del mes transcurrido ya son el 68% de los clientes de octubre. Quedan 1.271 sin compra; Quiroga, Córdoba y Bilyk tienen más de 100 pendientes cada uno.</p></li>`;
+const LECTURA_FECHA = '13/11/2026';
+const LECTURA = `     <li><span class="sev bad"></span><p><b>Cerveza mejora el ritmo, pero no alcanza.</b> Lleva 2.794 HL, 40% del objetivo con 43% del mes transcurrido. Desde el 4/11 promedia 192 HL por día hábil (eran 162 al 11/11) y necesita 324: a ese ritmo cerraría cerca de 5.300 HL, 76% del objetivo. El 12/11 vendió 381 HL, el mejor día desde el arranque del mes.</p></li>
+     <li><span class="sev good"></span><p><b>UNG va justo al ritmo que necesita y recuperó precio.</b> Lleva 1.987 HL (40% del objetivo) y desde el 4/11 vende 227 HL por día hábil, contra 228 necesarios. Después de caer a $103 mil/HL el 11/11, el 12 y el 13 salió a $165 y $151 mil, y el mes quedó en $129 mil (−2% contra el mínimo). Mayorista sigue en $115 mil.</p></li>
+     <li><span class="sev bad"></span><p><b>Cerveza sigue debajo del mínimo 9 de 10 días.</b> Promedia $288 mil/HL contra $320 mil, con una brecha de $90 M. Mayorista concentra 51% del volumen de Cerveza a $273 mil; K+T está en $311 mil.</p></li>
+     <li><span class="sev warn"></span><p><b>El margen bruto sigue en −8,9% sin trade spend.</b> Con TS queda en 9,5%. Mayorista es el canal más flojo (6,9% con TS). Andes Blanca lata 710 ya pierde $7,0 M aun con TS (el doble que al 11/11), seguida por Andes lata 473 (−$3,3 M) y Corona lata 473 (−$1,5 M).</p></li>
+     <li><span class="sev info"></span><p><b>Compraron 1.570 clientes, 58% de la cartera activa.</b> Con 43% del mes transcurrido ya son el 75% de los clientes de octubre. Por vendedor, Córdoba, Zubelzu y Bilyk están debajo del 50% de su cartera; Cubillos lleva 87%, y García y Salatino, 67% y 68%.</p></li>`;
 
 /* ---------- vistas ---------- */
 const V = {};
@@ -466,7 +466,7 @@ V.ejecutivo = () => {
   const cNeg = cliRes.reduce((s,v) => s+v, 0);
   if (cliRes.length) al.push({sev:'info', w:0, t:`<b>${N(cliRes.length)} clientes con resultado negativo aun con trade spend.</b> Suman ${MM(cNeg,1)}${-cNeg < Math.abs(pNeg) ? ': el problema de margen está más en productos que en clientes.' : '.'}`});
   if (cb && cb.sin) {
-    const pv = [...grp(cb.filas.filter(f => !f[5] && f[3]!=='Sin dato').map(f => [f[3]]), f => f[0], [])].map(([k,a]) => [k, a.n]).sort((a,b) => b[1]-a[1]).slice(0,3);
+    const pv = [...grp(cb.filas.filter(f => !f[5] && f[3]!=='Sin dato').flatMap(f => String(f[3]).split(' / ').map(v => [v])), f => f[0], [])].map(([k,a]) => [k, a.n]).sort((a,b) => b[1]-a[1]).slice(0,3);
     al.push({sev: HAB_TRANS>=HAB.length/2 ? 'warn' : 'info', w:0, t:`<b>${N(cb.sin)} clientes activos todavía no compraron este mes.</b>${pv.length ? ` Los vendedores con más pendientes: ${pv.map(([k,n]) => `${esc(k)} (${N(n)})`).join(', ')}.` : ''}`});
   }
   if (r.pmb < 0) al.push({sev:'info', w:0, t:`<b>El trade spend sostiene el resultado.</b> Sin él, el margen bruto es ${PCT(r.pmb,1)}; el TS equivale al ${PCT(r.ts/r.ne,1)} de la venta neta.`});
@@ -507,13 +507,18 @@ V.ejecutivo = () => {
 V.cobertura = () => {
   const cb = cobDatos();
   if (!cb) return `<div class="vh"><div><h1>Clientes y cobertura</h1><p>Esta vista necesita las pestañas "Clientes activos" (la lista de clientes) y "Compras por cliente" en el Excel.</p></div></div>`;
-  const ven = [...new Set(cb.filas.filter(f => !f[5]).map(f => f[3]))].sort((a,b) => a.localeCompare(b));
+  // un cliente compartido trae sus vendedores separados por " / ": cuenta en la cartera de cada uno
+  const vendsDe = f => String(f[3]).split(' / ');
+  const ven = [...new Set(cb.filas.filter(f => !f[5]).flatMap(vendsDe))].sort((a,b) => a.localeCompare(b));
+  const soloSinCompra = !cb.filas.some(f => f[5] && f[3]!=='Sin dato');
+  const compartidos = cb.filas.filter(f => vendsDe(f).length > 1).length;
   if (st.cobVen && !ven.includes(st.cobVen)) st.cobVen = '';
   const cuenta = (key) => { const m = new Map(); cb.filas.forEach(f => { const k = f[key]; const a = m.get(k) || [0,0]; a[0]++; a[1] += f[5]; m.set(k,a); }); return [...m].map(([k,a]) => [k, a[0], a[1], a[0]-a[1], a[1]/a[0]]); };
   const cols = n => [{t:n,l:1},{t:'Cartera',f:v=>N(v)},{t:'Con compra',f:v=>N(v)},{t:'Sin compra',f:v=>N(v)},{t:'Cobertura',f:v=>PCT(v,0)}];
   const pie = ['Total', cb.base, cb.comp, cb.sin, cb.cob];
   const unOrden = UN.filter(u => COB.porUN[u]).map(u => [u, COB.porUN[u]]);
-  const listaVen = [...grp(cb.filas.filter(f => !f[5]).map(f => [f[3]]), f => f[0], [])].map(([k,a]) => [k, a.n, a.n/cb.sin]);
+  const listaVen = [...grp(cb.filas.filter(f => !f[5]).flatMap(f => vendsDe(f).map(v => [v])), f => f[0], [])].map(([k,a]) => [k, a.n, a.n/cb.sin]);
+  const cobVen = () => { const m = new Map(); cb.filas.forEach(f => vendsDe(f).forEach(k => { const a = m.get(k) || [0,0]; a[0]++; a[1] += f[5]; m.set(k,a); })); return [...m].map(([k,a]) => [k, a[0], a[1], a[0]-a[1], a[1]/a[0]]); };
   setTimeout(() => {
     const o = baseOpts();
     const datos = [['Cualquier unidad', cb.comp]].concat(st.ca<0 && st.de<0 ? unOrden : []);
@@ -527,15 +532,15 @@ V.cobertura = () => {
       options:{...o, plugins:{...o.plugins, tooltip:{...o.plugins.tooltip, callbacks:{label:c => `${c.dataset.label}: ${N(c.raw)} clientes${c.dataIndex===MC-1&&c.datasetIndex===0?' (a la fecha)':''}`}}}}});
     table(document.getElementById('tCobCanal'), cols('Canal'), cuenta(1).map(r => [CANAL_NOMBRE[r[0]]||r[0]].concat(r.slice(1))), {sort:1, foot:pie});
     table(document.getElementById('tCobDep'), cols('Departamento'), cuenta(2), {sort:1, foot:pie});
-    table(document.getElementById('tCobVen'), [{t:'Vendedor',l:1},{t:'Sin compra',f:v=>N(v)},{t:'% de los pendientes',f:v=>PCT(v,0)}], listaVen, {sort:1, foot:['Total', cb.sin, 1]});
-    const pend = cb.filas.filter(f => !f[5] && (!st.cobVen || f[3]===st.cobVen)).map(f => [f[0], CANAL_NOMBRE[f[1]]||f[1], f[2], f[3], f[4] ? f[4].split('-').reverse().join('/') : '']);
+    if (soloSinCompra) table(document.getElementById('tCobVen'), [{t:'Vendedor',l:1},{t:'Sin compra',f:v=>N(v)},{t:'% de los pendientes',f:v=>PCT(v,0)}], listaVen, {sort:1, foot:['Total', cb.sin, 1]});
+    else table(document.getElementById('tCobVen'), cols('Vendedor'), cobVen(), {sort:4, dir:1, foot:pie});
+    const pend = cb.filas.filter(f => !f[5] && (!st.cobVen || vendsDe(f).includes(st.cobVen))).map(f => [f[0], CANAL_NOMBRE[f[1]]||f[1], f[2], f[3], f[4] ? f[4].split('-').reverse().join('/') : '']);
     table(document.getElementById('tCobPend'), [{t:'Cliente',l:1},{t:'Canal',l:1},{t:'Departamento',l:1},{t:'Vendedor',l:1},{t:'Alta',l:1}], pend, {sort:0, dir:1, search:'Buscar cliente'});
     const sel = document.getElementById('cobVen'); if (sel) { sel.value = st.cobVen||''; sel.onchange = () => { st.cobVen = sel.value; render(); }; }
   });
   const vs = (full, dia, nom) => dia!=null && !cb.filtrado ? `<div class="val">${SPCT(cb.comp/dia-1,0)}</div><div class="sub">Al mismo día de ${nom}: ${N(dia)} clientes</div>`
     : `<div class="val">${PCT(cb.comp/full,0)}</div><div class="sub">de los ${N(full)} clientes de ${nom} completo</div><div class="sub">Mes transcurrido ${PCT(HAB_TRANS/HAB.length,0)}</div>`;
   const sinMismoDia = COB.prevDia==null || COB.lyDia==null;
-  const soloSinCompra = !cb.filas.some(f => f[5] && f[3]!=='Sin dato');
   return `<div class="vh"><div><h1>Clientes y cobertura · ${mcn} ${YR}</h1><p>La cartera activa son los clientes dados de alta, compren o no. Un cliente con compra cuenta una vez aunque compre varias unidades de negocio: su volumen neto del mes tiene que ser positivo.</p></div></div>
   <div class="grid k5">
    <div class="card kpi"><div class="lab">Cartera activa</div><div class="val">${N(cb.base)}</div><div class="sub">clientes dados de alta${cb.filtrado?' · con los filtros aplicados':''}</div></div>
@@ -552,13 +557,21 @@ V.cobertura = () => {
    <div class="card"><h2>Cobertura por canal</h2><div id="tCobCanal"></div></div>
    <div class="card"><h2>Cobertura por departamento</h2><div id="tCobDep"></div></div>
   </div>
-  <div class="grid g21">
+  ${soloSinCompra ? `<div class="grid g21">
    <div class="card"><h2>Clientes activos sin compra en ${mcn} <small>la lista para salir a buscarlos</small></h2>
     <div class="cobsel"><label for="cobVen">Vendedor<select id="cobVen"><option value="">Todos</option>${ven.map(v => `<option value="${esc(v)}">${esc(v)}</option>`).join('')}</select></label></div>
     <div id="tCobPend"></div></div>
-   <div class="card"><h2>Pendientes por vendedor</h2><div id="tCobVen"></div>
+   <div class="card"><h2>${soloSinCompra?'Pendientes por vendedor':'Cobertura por vendedor <small>ordenado de menor a mayor cobertura</small>'}</h2><div id="tCobVen"></div>
+    ${!soloSinCompra&&compartidos?`<p class="note">${N(compartidos)} clientes tienen dos vendedores y cuentan en la cartera de cada uno, por eso la suma de las carteras supera el total.</p>`:''}
     ${soloSinCompra?'<p class="note">La pestaña Clientes activos trae solo a los clientes sin compra, así que no se puede calcular la cobertura de cada vendedor. Si trae toda la cartera, también la de los que compraron, se agrega.</p>':''}</div>
-  </div>
+  </div>` : `<div class="grid">
+   <div class="card"><h2>${soloSinCompra?'Pendientes por vendedor':'Cobertura por vendedor <small>ordenado de menor a mayor cobertura</small>'}</h2><div id="tCobVen"></div>
+    ${!soloSinCompra&&compartidos?`<p class="note">${N(compartidos)} clientes tienen dos vendedores y cuentan en la cartera de cada uno, por eso la suma de las carteras supera el total.</p>`:''}
+    ${soloSinCompra?'<p class="note">La pestaña Clientes activos trae solo a los clientes sin compra, así que no se puede calcular la cobertura de cada vendedor. Si trae toda la cartera, también la de los que compraron, se agrega.</p>':''}</div>
+   <div class="card"><h2>Clientes activos sin compra en ${mcn} <small>la lista para salir a buscarlos</small></h2>
+    <div class="cobsel"><label for="cobVen">Vendedor<select id="cobVen"><option value="">Todos</option>${ven.map(v => `<option value="${esc(v)}">${esc(v)}</option>`).join('')}</select></label></div>
+    <div id="tCobPend"></div></div>
+  </div>`}
   ${sinMismoDia?`<p class="note">Las comparaciones contra ${cb.antNom} y contra ${mcn} ${YA} son contra el mes completo, porque la pestaña Compras por cliente trae solo ${mcn}. Si suma las compras de esos meses, el tablero compara al mismo día.</p>`:''}`;
 };
 
